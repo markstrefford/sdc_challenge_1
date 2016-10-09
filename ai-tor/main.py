@@ -83,7 +83,7 @@ adam = Adam(lr=0.01, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
 model.compile(optimizer=adam, loss="mse")
 #model.train_on_batch(data[0], data[1])
 model.fit_generator(
-    udacity_data_generator("/media/aitor/Data1/dataset.bag", 100, 150, shift=None,randomize=True),
+    udacity_data_generator("/media/aitor/Data1/dataset.bag", 100, 150, shift=1,randomize=False),
     samples_per_epoch=100,
     nb_epoch=150
     #validation_data=udacity_data_generator(datasetsDir + "dataset.bag", 1000),
