@@ -10,3 +10,5 @@ import utils
 datafile = utils.get_datafile()
 bag = rosbag.Bag(datafile)
 print bag.get_message_count('/center_camera/image_color')
+print bag.get_message_count('/left_camera/image_color')
+print bag.get_message_count('/right_camera/image_color')
