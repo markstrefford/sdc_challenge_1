@@ -12,8 +12,8 @@ import cv2
 import numpy as np
 from cv_bridge import CvBridge
 from keras.optimizers import Adam
+import utils
 
-datasetsDir = "/media/aitor/Data1/"
 batch_size = 10000
 
 def udacity_data_generator(path, batch_size):
@@ -42,13 +42,13 @@ model = nnmodel.getNNModel()
 #sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
 adam = Adam(lr=0.01, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
 model.compile(optimizer=adam, loss="mse")
-
+datafile = utils.get_datafile()
 
 model.fit_generator(
-    udacity_data_generator(datasetsDir + "dataset.bag", batch_size),
+    udacity_data_generator(datafile, batch_size),
     samples_per_epoch=batch_size,
     nb_epoch=200,
-    validation_data=udacity_data_generator(datasetsDir + "dataset.bag", 1000),
+    validation_data=udacity_data_generator(datafile, 1000),
     nb_val_samples=1000,
 )
 
