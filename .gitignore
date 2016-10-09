@@ -2,6 +2,7 @@
 
 dataset/
 weights/
+.idea/
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
