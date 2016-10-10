@@ -22,8 +22,8 @@ Results of the code and new discoveries will be communicated through the Slack c
 
 ### Who do I talk to? ###
 
-Our main channel of communication is the Slack channel: https://nd013.slack.com/messages/team_drive/
+Our main channel of communication is the Slack channel: https://nd013.slack.com/messages/turing_tuners/
 
 ### Resources ###
 
-Challenge 1 description: https://nd013.slack.com/messages/team_drive/files/F2FFBJ37T/
+Challenge 1 description: https://medium.com/udacity/challenge-2-using-deep-learning-to-predict-steering-angles-f42004a36ff3#.8u9hxy8wh
