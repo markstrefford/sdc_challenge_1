@@ -1,4 +1,4 @@
-from keras.wrappers.scikit_learn import KerasClassifier
+from keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.model_selection import GridSearchCV
 from keras import optimizers
 import numpy
@@ -17,7 +17,7 @@ def grid_search(x,y, validation_split=0.4):
     seed = 7
     numpy.random.seed(seed)
     # create model
-    model = KerasClassifier(build_fn=create_model, verbose=0)
+    model = KerasRegressor(build_fn=create_model, verbose=0)
     # grid search epochs, batch size and optimizer
     # feel free to adjust this stuffs to test more than I have here
     optimizers = ['SGD','RMSprop', 'Adam']
