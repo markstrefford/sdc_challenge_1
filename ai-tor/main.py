@@ -13,7 +13,8 @@ import cv2
 import numpy as np
 from cv_bridge import CvBridge
 from keras.optimizers import Adam
-  
+import utils
+
 #TODO: Find a way to randomize without so many memory consumption
 def udacity_data_generator(path, batchsize, nepochs, shift=None, randomize=True):
     if randomize:
@@ -76,6 +77,9 @@ def udacity_data_generator(path, batchsize, nepochs, shift=None, randomize=True)
             
                 bag.close()
 
+# Find dataset
+datafile = utils.get_datafile()
+
 # Train model
 model = nnmodel.getNNModel()
 #sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
@@ -83,7 +87,7 @@ adam = Adam(lr=0.01, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
 model.compile(optimizer=adam, loss="mse")
 #model.train_on_batch(data[0], data[1])
 model.fit_generator(
-    udacity_data_generator("/media/aitor/Data1/dataset.bag", 100, 150, shift=1,randomize=False),
+    udacity_data_generator(datafile, 100, 150, shift=1,randomize=False),
     samples_per_epoch=100,
     nb_epoch=150
     #validation_data=udacity_data_generator(datasetsDir + "dataset.bag", 1000),
