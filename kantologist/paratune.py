@@ -23,8 +23,8 @@ def grid_search(x,y, validation_split=0.4):
     optimizers = ['SGD','RMSprop', 'Adam']
     init = ['glorot_uniform', 'normal', 'uniform', 'lecun_uniform', 'zero']
     lr = numpy.array([0.01,0.01,0.1])
-    epochs = numpy.array([10, 10, 200])
-    batches = numpy.array([5, 10, 20])
+    epochs = numpy.array([10, 100, 150, 200, 250])
+    batches = numpy.array([5, 10, 20, 50, 100, 150, 200])
     param_grid = dict(optimizer=optimizers, nb_epoch=epochs, batch_size=batches, init=init)
     grid = GridSearchCV(estimator=model, param_grid=param_grid)
     grid_result = grid.fit(x, y)
