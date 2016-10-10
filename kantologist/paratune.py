@@ -5,7 +5,7 @@ import numpy
 import nnmodel
 
 # The model from ai-tor
-def create_model(optimizer='adam' , init='normal', lr=0.01, loss="mse"):
+def create_model(optimizer='Adam' , init='normal', lr=0.01, loss="mse"):
     model = nnmodel.getNNModel()
     optimizers.optimizer(lr=lr)
     model.compile(optimizer=optimizer, init=init)
@@ -30,6 +30,6 @@ def grid_search(x,y, validation_split=0.4):
     grid_result = grid.fit(x, y)
     # summarize results
     print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
-    # feel free to comment if you can afford to print all the results on your screen. Warning! It's gonna be pretty long
+    # feel free to uncomment if you can afford to print all the results on your screen. Warning! It's gonna be pretty long
     #for params, mean_score, scores in grid_result.grid_scores_:
     #    print("%f (%f) with: %r" % (scores.mean(), scores.std(), params))
