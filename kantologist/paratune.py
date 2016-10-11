@@ -7,7 +7,11 @@ import nnmodel
 # The model from ai-tor
 def create_model(optimizer='Adam' , init='normal', lr=0.01, loss="mse"):
     model = nnmodel.getNNModel()
-    optimizers.optimizer(lr=lr)
+    # other parameters can be set by adding more if statements if needed
+    if optimizer == 'SGD':
+        optimizers.optimizer(lr=lr,nesterov=True)
+    else:
+        optimizers.optimizer(lr=lr)
     model.compile(optimizer=optimizer, init=init)
     model.compile()
 
@@ -22,7 +26,7 @@ def grid_search(x,y, validation_split=0.4):
     # feel free to adjust this stuffs to test more than I have here
     optimizers = ['SGD','RMSprop', 'Adam']
     init = ['glorot_uniform', 'normal', 'uniform', 'lecun_uniform', 'zero']
-    lr = numpy.array([0.01,0.01,0.1])
+    lr = numpy.array([0.01,0.05,0.1])
     epochs = numpy.array([10, 10, 200])
     batches = numpy.array([5, 10, 20])
     param_grid = dict(optimizer=optimizers, nb_epoch=epochs, batch_size=batches, init=init)
