@@ -7,7 +7,6 @@ Created on Sun Oct  9 10:38:10 2016
 import rosbag
 import utils
 
-datafile = utils.get_datafile()
 bag = rosbag.Bag(datafile)
 print bag.get_message_count('/center_camera/image_color')
 print bag.get_message_count('/left_camera/image_color')

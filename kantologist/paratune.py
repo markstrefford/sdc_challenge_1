@@ -9,12 +9,11 @@ def create_model(optimizer='Adam' , init='normal', lr=0.01, loss="mse"):
     model = nnmodel.getNNModel()
     optimizers.optimizer(lr=lr)
     model.compile(optimizer=optimizer, init=init)
-    model.compile()
+    #model.compile()
 
 # Randomn search could also be implemented but let's test this first
 def grid_search(x,y, validation_split=0.4):
-    #fix numpy randomn seed
-    seed = 7
+    seed = random.randint(0, sys.maxint)
     numpy.random.seed(seed)
     # create model
     model = KerasRegressor(build_fn=create_model, verbose=0)
