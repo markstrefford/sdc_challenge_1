@@ -17,7 +17,7 @@ from keras.regularizers import l2
 def getNNModel(weights_path=None):
 
     ch, width, height = 3, 200, 66
-    reg_lambda = 0.1;
+    reg_lambda = 0;
     
     model = Sequential()
     model.add(Lambda(lambda x: x/127.5 - 1., input_shape=(height, width, ch), output_shape=(height, width, ch)))
