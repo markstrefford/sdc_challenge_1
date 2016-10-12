@@ -14,15 +14,17 @@ from cv_bridge import CvBridge
 
 print "pygame.init()"
 pygame.init()
-scale = 4
+scale = 2
 frame_size = (200, 66)
-#display_size = (frame_size[0] * scale, frame_size[1] * scale)
+display_size = (frame_size[0] * scale, frame_size[1] * scale)
 print "pygame.display.set_caption()"
 pygame.display.set_caption("SDC Challenge 2 Data Viewer")
 print "pygame.display.set_mode()"
-screen = pygame.display.set_mode(frame_size, pygame.DOUBLEBUF)
+#screen = pygame.display.set_mode(frame_size, pygame.DOUBLEBUF)
+screen = pygame.display.set_mode(display_size, pygame.DOUBLEBUF)
 print "pygame.surface.Surface()"
 camera_surface = pygame.surface.Surface(frame_size, 0, 24).convert()
+#display_surface = pygame.surface.Surface(display_size, 0, 24).convert()
 
 # Get frames and steering angle
 print "utils.get_datafile()"
@@ -50,15 +52,14 @@ for topic, msg, t in bag.read_messages(
     elif (topic == '/center_camera/image_color'):
         img = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), frame_size).swapaxes(0,1)
         x[i] = img
-        y[i] = np.array([current_steering]);
+        y[i] = np.array([current_steering])
 
         # Display image
-        #img_swapaxes = img.swapaxes(0,1)  #.swapaxes(0,1)
-        #print img.shape, img.swap_axes.shape
         pygame.surfarray.blit_array(camera_surface, img)
-        #scaled_surface = pygame.transform.scale(camera_surface, display_size, (0,0))
-        #camera_surface_2x = pygame.transform.scale(img, display_size, (0,0))
-        screen.blit(camera_surface, (0, 0))
+        scaled_surface = pygame.transform.scale(camera_surface, display_size)
+
+        #screen.blit(camera_surface, (0, 0))
+        screen.blit(scaled_surface, (0, 0))
         pygame.display.flip()
 
         i = i + 1
