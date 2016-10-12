@@ -14,10 +14,9 @@ from keras.regularizers import l2
 #Based on:
 #   75% NVIDIA's end-to-end paper: https://arxiv.org/pdf/1604.07316v1.pdf
 #   25% Comma.ai research: https://github.com/commaai/research/blob/master/SelfSteering.md
-def getNNModel(weights_path=None):
+def getNNModel(weights_path=None, reg_lambda=0.0):
 
     ch, width, height = 3, 200, 66
-    reg_lambda = 0;
     
     model = Sequential()
     model.add(Lambda(lambda x: x/127.5 - 1., input_shape=(height, width, ch), output_shape=(height, width, ch)))
