@@ -23,7 +23,7 @@ from cv_bridge import CvBridge
 
 
 
-def test_load_udacity_dataset(path):
+def test_load_udacity_dataset(path, frame_size):
     while 1:
         # Start by getting the images from the databag and displaying them one at a time
         bag = rosbag.Bag(path)
@@ -41,6 +41,7 @@ def test_load_udacity_dataset(path):
                 current_steering = msg.steering_wheel_angle
             elif (topic == '/center_camera/image_color'):
                 x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), frame_size).swapaxes(0, 1)
+                #x[i] = CvBridge().imgmsg_to_cv2(msg, "bgr8").swapaxes(0, 1)
                 # x[i] = img
                 y[i] = np.array([current_steering])
 
@@ -73,8 +74,9 @@ def test_load_udacity_dataset(path):
 # Setup pygame
 print "pygame.init()"
 pygame.init()
-scale = 2
-frame_size = (200, 66)
+scale = 4 #4
+frame_size = (160, 120)
+#frame_size = (320, 240)
 display_size = (frame_size[0] * scale, frame_size[1] * scale)
 print "pygame.display.set_caption()"
 pygame.display.set_caption("SDC Challenge 2 Data Viewer")
@@ -90,7 +92,7 @@ i=0
 path = utils.get_datafile()
 #data = test_load_udacity_dataset(path)
 
-for img, steering in test_load_udacity_dataset(path):
+for img, steering in test_load_udacity_dataset(path, frame_size):
     print img[i].shape, steering[i]
 
     # Display image
