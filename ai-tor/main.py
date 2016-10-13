@@ -78,7 +78,7 @@ def udacity_data_generator(batchsize, nepochs, path="/media/aitor/Data/udacity/d
 
 # Train model
 val_data = utils.load_randomized_udacity_dataset("/media/aitor/Data/udacity/dataset.bag")
-model = nnmodel.getNNModel()
+model = nnmodel.getNNModel(reg_lambda = 0.4)
 
 #sgd = SGD(lr=0.1, decay=1e-6, momentum=0.9, nesterov=True)
 adam = Adam(lr=0.01, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
