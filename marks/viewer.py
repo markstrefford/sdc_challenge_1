@@ -25,11 +25,8 @@ from cv_bridge import CvBridge
 
 def test_load_udacity_dataset(path, frame_size):
     while 1:
-        # Start by getting the images from the databag and displaying them one at a time
         bag = rosbag.Bag(path)
         nmessages = bag.get_message_count('/center_camera/image_color')
-        x = np.empty([nmessages, frame_size[0], frame_size[1], 3])
-        y = np.empty([nmessages, 1])
         i = 0
 
         # for topic, msg, t in bag.read_messages(
@@ -40,19 +37,9 @@ def test_load_udacity_dataset(path, frame_size):
             if (topic == '/vehicle/steering_report'):
                 current_steering = msg.steering_wheel_angle
             elif (topic == '/center_camera/image_color'):
-                x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), frame_size).swapaxes(0, 1)
-                #x[i] = CvBridge().imgmsg_to_cv2(msg, "bgr8").swapaxes(0, 1)
-                # x[i] = img
-                y[i] = np.array([current_steering])
-
-                # # Display image
-                # pygame.surfarray.blit_array(camera_surface, img)
-                # scaled_surface = pygame.transform.scale(camera_surface, display_size)
-                #
-                # # screen.blit(camera_surface, (0, 0))
-                # screen.blit(scaled_surface, (0, 0))
-                # pygame.display.flip()
-                yield (x, y)
+                img = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), frame_size).swapaxes(0, 1)  #x[i] = ...
+                steering_angle = np.array([current_steering])   # y[i] = ...
+                yield (img, steering_angle)   # (x, y)
                 i += 1
 
             # elif (topic == '/left_camera/image_color'):
@@ -67,16 +54,16 @@ def test_load_udacity_dataset(path, frame_size):
             if i % 100 == 0:
                 print "Loaded image {}/{}".format(i, nmessages)
             if (i == nmessages):
-                yield (x, y)  # TODO - Needed?
+                yield (img, steering_angle)
 
         bag.close()
 
 # Setup pygame
 print "pygame.init()"
 pygame.init()
-scale = 4 #4
-frame_size = (160, 120)
-#frame_size = (320, 240)
+scale = 1 #4
+#frame_size = (160, 120)
+frame_size = (640, 480)
 display_size = (frame_size[0] * scale, frame_size[1] * scale)
 print "pygame.display.set_caption()"
 pygame.display.set_caption("SDC Challenge 2 Data Viewer")
@@ -93,10 +80,10 @@ path = utils.get_datafile()
 #data = test_load_udacity_dataset(path)
 
 for img, steering in test_load_udacity_dataset(path, frame_size):
-    print img[i].shape, steering[i]
+    #print img.shape, steering
 
     # Display image
-    pygame.surfarray.blit_array(camera_surface, img[i])
+    pygame.surfarray.blit_array(camera_surface, img)
     scaled_surface = pygame.transform.scale(camera_surface, display_size)
 
     # screen.blit(camera_surface, (0, 0))
