@@ -1,5 +1,6 @@
 from keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.model_selection import GridSearchCV
+from keras.callbacks import EarlyStopping
 from keras import optimizers
 import random
 import numpy
@@ -16,22 +17,22 @@ def create_model(optimizer='Adam' , init='normal', lr=0.01, reg_lambda=0.0):
     return model
 
 # Randomn search could also be implemented but let's test this first
-def grid_search(x,y, validation_split=0.4):
+def grid_search(x,y):
     seed = random.randint(0, 4294967295)
     numpy.random.seed(seed)
     # create model
     model = KerasRegressor(build_fn=create_model, verbose=0)
+    stopping_callback = EarlyStopping(patience=5)
+    fit_params = dict(callbacks=[stopping_callback], validation_split=0.4, batch_size=100, nb_epoch=10)
     # grid search epochs, batch size and optimizer
     # feel free to adjust this stuffs to test more than I have here
-    optimizers = ['SGD','RMSprop', 'Adam']
+    optimizers = ['RMSprop', 'Adam']
     #init = ['glorot_uniform', 'normal', 'uniform', 'lecun_uniform', 'zero'] #not used for now
     lr = [0.01,0.05,0.1]
-    epochs = [10, 100, 150, 200, 250, 500]
-    batches = [5, 10, 20, 50, 100, 150, 200]
     reg_lambda = [0, 0.01, 0.1, 0.2, 0.5, 1]
 
-    param_grid = dict(lr=lr, optimizer=optimizers, reg_lambda=reg_lambda, batch_size=batches, nb_epoch=epochs)
-    grid = GridSearchCV(estimator=model, param_grid=param_grid)
+    param_grid = dict(lr=lr, optimizer=optimizers, reg_lambda=reg_lambda)
+    grid = GridSearchCV(estimator=model, param_grid=param_grid, fit_params=fit_params)
     grid_result = grid.fit(x, y)
     # summarize results
     print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
@@ -42,5 +43,5 @@ def grid_search(x,y, validation_split=0.4):
 
 #test
 
-data = utils.load_randomized_udacity_dataset("/media/aitor/Data/udacity/dataset.bag")
+data = utils.load_randomized_udacity_dataset("/media/aitor/Data/udacity/dataset-croped.bag")
 grid_search(data[0], data[1])

@@ -3,6 +3,7 @@ import rosbag
 import cv2
 import numpy as np
 from cv_bridge import CvBridge
+import sys
 
 def get_datafile():
     datafile = "dataset.bag"
@@ -77,4 +78,54 @@ def rosbag_to_numpy_file(path, outpath=None, shift=None):
     if (outpath is None):
         outpath = path + ".npz"
     np.savez(outpath, data[0], data[1])
-    
+
+def query_yes_no(question, default="yes"):
+    """Ask a yes/no question via raw_input() and return their answer.
+
+    "question" is a string that is presented to the user.
+    "default" is the presumed answer if the user just hits <Enter>.
+        It must be "yes" (the default), "no" or None (meaning
+        an answer is required of the user).
+
+    The "answer" return value is True for "yes" or False for "no".
+    """
+    valid = {"yes": True, "y": True, "ye": True,
+             "no": False, "n": False}
+    if default is None:
+        prompt = " [y/n] "
+    elif default == "yes":
+        prompt = " [Y/n] "
+    elif default == "no":
+        prompt = " [y/N] "
+    else:
+        raise ValueError("invalid default answer: '%s'" % default)
+
+    while True:
+        sys.stdout.write(question + prompt)
+        choice = raw_input().lower()
+        if default is not None and choice == '':
+            return valid[default]
+        elif choice in valid:
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no' "
+                             "(or 'y' or 'n').\n")
+                             
+def crop_rosbag_file(inpath, outpath, nummsgs):
+    with rosbag.Bag(outpath, 'w') as outbag:
+        for topic, msg, t in rosbag.Bag(inpath).read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color']):
+            if nummsgs < 1:
+                break
+            nummsgs -= 1
+            outbag.write(topic, msg, t)
+
+def clean_rosbag_file(inpath, outpath):
+	with rosbag.Bag(outpath, 'w') as outbag:
+		current_speed = 0
+		for topic, msg, t in rosbag.Bag(inpath).read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color']):
+			if (topic == '/vehicle/steering_report'):
+				current_speed = msg.speed
+
+			if (current_speed > 8.0):
+				outbag.write(topic, msg, t)
+
