@@ -14,4 +14,5 @@ import utils
 #utils.crop_rosbag_file("/media/aitor/Data/udacity/dataset.bag", "/media/aitor/Data/udacity/dataset-croped.bag", 1700)
 utils.clean_rosbag_file("/media/aitor/Data/udacity/dataset.bag", "/media/aitor/Data/udacity/dataset-clean.bag")
 utils.clean_rosbag_file("/media/aitor/Data/udacity/dataset-2-2.bag", "/media/aitor/Data/udacity/dataset2-clean.bag")
+utils.clean_rosbag_file("/media/aitor/Data/udacity/dataset3.bag", "/media/aitor/Data/udacity/dataset3-clean.bag")
 
