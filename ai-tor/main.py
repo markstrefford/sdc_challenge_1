@@ -22,10 +22,10 @@ model.compile(optimizer=optimizer, loss="mse")
 stopping_callback = EarlyStopping(patience=5)
 
 model.fit_generator(
-    utils.udacity_data_generator(100),
+    utils.udacity_data_generator(100, path="/media/aitor/Data/udacity/dataset3-clean.bag"),
     samples_per_epoch=100,
     nb_epoch=500,
-    validation_data=utils.udacity_data_generator(100),
+    validation_data=utils.udacity_data_generator(100, path="/media/aitor/Data/udacity/dataset2-clean.bag"),
     callbacks=[stopping_callback]
 )
 #-----------------------------

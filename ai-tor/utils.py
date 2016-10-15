@@ -17,7 +17,7 @@ def get_datafile():
         datasetsDir = "/media/aitor/Data1/"
     return datasetsDir + datafile
     
-def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/dataset2-clean.bag", shift=None):
+def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/dataset3-clean.bag", shift=None):
     #Not shited sequential data generator
     if (shift is None):
         while 1:
