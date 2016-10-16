@@ -82,7 +82,7 @@ rdst = \
   [41.67121717733509, -2.029755283648498]]
 
 tform3_img = tf.ProjectiveTransform()
-tform3_img.estimate(np.array(rdst), np.array(rsrc))
+tform3_img.estimate(np.array(rdst), np.array(rsrc))   # *2 required due to viewer size (640x480)
 
 def perspective_tform(x, y):
   p1, p2 = tform3_img((x,y))[0]
@@ -102,10 +102,10 @@ def draw_path(img, path_x, path_y, color):
 def calc_curvature(v_ego, angle_steers, angle_offset=0):
   deg_to_rad = np.pi/180.
   slip_fator = 0.0014 # slip factor obtained from real data
-  steer_ratio = 15.3  # from http://www.edmunds.com/acura/ilx/2016/road-test-specs/
-  wheel_base = 2.67   # from http://www.edmunds.com/acura/ilx/2016/sedan/features-specs/
+  steer_ratio = 14.8  # from http://www.edmunds.com/acura/ilx/2016/road-test-specs/
+  wheel_base = 2.85   # from http://www.edmunds.com/acura/ilx/2016/sedan/features-specs/
 
-  angle_steers_rad = (angle_steers - angle_offset) #* deg_to_rad
+  angle_steers_rad = (angle_steers - angle_offset) #* deg_to_rad (Udacity data already in rads)
   curvature = angle_steers_rad/(steer_ratio * wheel_base * (1. + slip_fator * v_ego**2))
   return curvature
 
@@ -118,7 +118,7 @@ def calc_lookahead_offset(v_ego, angle_steers, d_lookahead, angle_offset=0):
   return y_actual, curvature
 
 def draw_path_on(img, speed_ms, angle_steers, color=(0,0,255)):
-    path_x = np.arange(0., 50.1, 0.25)
+    path_x = np.arange(0., 20.1, 0.25)
     path_y, _ = calc_lookahead_offset(speed_ms, angle_steers, path_x)
     draw_path(img, path_x, path_y, color)
 
@@ -130,8 +130,8 @@ def predict_steering_angle(i, img, speed):
     return 0    # Default to straight ahead for now
 
 
-# Setup 
-frame_size = (320, 240)
+# Setup
+frame_size = (320,240)
 
 # Main Loop
 i=0
