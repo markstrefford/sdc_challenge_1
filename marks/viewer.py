@@ -13,6 +13,7 @@ from cv_bridge import CvBridge
 
 # Load images from the ROS databag, resize accordingly and ensure orientation (w x h instead of h x w)
 def load_rosbag_data(path, frame_size):
+    print 'Loading databag...'
     while 1:
         bag = rosbag.Bag(path)
         nmessages = bag.get_message_count('/center_camera/image_color')
@@ -117,11 +118,9 @@ def calc_lookahead_offset(v_ego, angle_steers, d_lookahead, angle_offset=0):
   return y_actual, curvature
 
 def draw_path_on(img, speed_ms, angle_steers, color=(0,0,255)):
-    path_x = np.arange(0., 50.1, 0.5)
+    path_x = np.arange(0., 50.1, 0.25)
     path_y, _ = calc_lookahead_offset(speed_ms, angle_steers, path_x)
     draw_path(img, path_x, path_y, color)
-
-
 
 
 
@@ -131,21 +130,8 @@ def predict_steering_angle(i, img, speed):
     return 0    # Default to straight ahead for now
 
 
-# Setup pygame
-print "pygame.init()"
-pygame.init()
-scale = 1 #4
-#frame_size = (320, 160)
-frame_size = (640, 480)
-display_size = (frame_size[0] * scale, frame_size[1] * scale)
-print "pygame.display.set_caption()"
-##pygame.display.set_caption("SDC Challenge 2 Data Viewer")
-print "pygame.display.set_mode()"
-#screen = pygame.display.set_mode(frame_size, pygame.DOUBLEBUF)
-##screen = pygame.display.set_mode(display_size, pygame.DOUBLEBUF)
-print "pygame.surface.Surface()"
-##camera_surface = pygame.surface.Surface(frame_size, 0, 24).convert()
-#display_surface = pygame.surface.Surface(display_size, 0, 24).convert()
+# Setup 
+frame_size = (320, 240)
 
 # Main Loop
 i=0
@@ -156,7 +142,7 @@ for img, steering, speed in load_rosbag_data(path, frame_size):
 
     predicted_steering = predict_steering_angle(i, img, speed)
     draw_path_on(img, speed, steering)
-    #draw_path_on(img, speed, predicted_steering, (0, 255, 0))
+    draw_path_on(img, speed, predicted_steering, (0, 255, 0))
 
     # Display image
     cv2.imshow('Udacity challenge 2 - viewer', img)
@@ -164,12 +150,6 @@ for img, steering, speed in load_rosbag_data(path, frame_size):
 
     if key == ord('q'):
         break
-
-    #pygame.surfarray.blit_array(camera_surface, img)
-    #scaled_surface = pygame.transform.scale(camera_surface, display_size)
-
-    #screen.blit(scaled_surface, (0, 0))
-    #pygame.display.flip()
 
     print "{}: Steering angle: {} / Speed: {}".format(i,steering, speed)
     i += 1
