@@ -11,6 +11,48 @@ import rosbag
 import cv2
 from cv_bridge import CvBridge
 
+# Load images from the ROS databag, resize accordingly and ensure orientation (w x h instead of h x w)
+def load_rosbag_data(path, frame_size):
+    print 'Loading databag...'
+    while 1:
+        bag = rosbag.Bag(path)
+        nmessages = bag.get_message_count('/center_camera/image_color')
+        i = 0
+        steering_angle, current_wheel_speed, speed = 0, 0, 0
+
+        for topic, msg, t in bag.read_messages(
+            topics=['/vehicle/steering_report',
+                    '/center_camera/image_color',
+                    '/left_camera/image_color',
+                    '/right_camera/image_color']):
+
+            if (topic == '/vehicle/steering_report'):
+                current_steering = msg.steering_wheel_angle
+                current_speed = msg.speed
+            elif (topic == '/center_camera/image_color'):
+                img = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), frame_size,
+                                 interpolation = cv2.INTER_LINEAR) #.swapaxes(0, 1)  #x[i] = ...
+                steering_angle = current_steering
+                speed = current_speed
+                yield (img, steering_angle, speed)   # (x, y)
+                i += 1
+
+            # elif (topic == '/left_camera/image_color'):
+            #     x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+            #     y[i] = np.array([current_steering + shift]);
+            #     i = i + 1
+            # elif (topic == '/right_camera/image_color'):
+            #     x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+            #     y[i] = np.array([current_steering - shift]);
+            #     i = i + 1
+
+            if i % 100 == 0:
+                print "Loaded image {}/{}".format(i, nmessages)
+            if (i == nmessages):
+                yield (img, steering_angle, speed)
+
+        bag.close()
+
 
 # Based on code from comma.ai viewer
 # ***** get perspective transform for images *****
@@ -40,7 +82,7 @@ rdst = \
   [41.67121717733509, -2.029755283648498]]
 
 tform3_img = tf.ProjectiveTransform()
-tform3_img.estimate(np.array(rdst), np.array(rsrc))
+tform3_img.estimate(np.array(rdst), np.array(rsrc))   # *2 required due to viewer size (640x480)
 
 def perspective_tform(x, y):
   p1, p2 = tform3_img((x,y))[0]
@@ -56,14 +98,14 @@ def draw_pt(img, x, y, color, sz=1):
 def draw_path(img, path_x, path_y, color):
   for x, y in zip(path_x, path_y):
     draw_pt(img, x, y, color)
-      
+
 def calc_curvature(v_ego, angle_steers, angle_offset=0):
   deg_to_rad = np.pi/180.
   slip_fator = 0.0014 # slip factor obtained from real data
-  steer_ratio = 15.3  # from http://www.edmunds.com/acura/ilx/2016/road-test-specs/
-  wheel_base = 2.67   # from http://www.edmunds.com/acura/ilx/2016/sedan/features-specs/
+  steer_ratio = 14.8  # from http://www.edmunds.com/acura/ilx/2016/road-test-specs/
+  wheel_base = 2.85   # from http://www.edmunds.com/acura/ilx/2016/sedan/features-specs/
 
-  angle_steers_rad = (angle_steers - angle_offset) * deg_to_rad
+  angle_steers_rad = (angle_steers - angle_offset) #* deg_to_rad (Udacity data already in rads)
   curvature = angle_steers_rad/(steer_ratio * wheel_base * (1. + slip_fator * v_ego**2))
   return curvature
 
@@ -75,51 +117,12 @@ def calc_lookahead_offset(v_ego, angle_steers, d_lookahead, angle_offset=0):
   y_actual = d_lookahead * np.tan(np.arcsin(np.clip(d_lookahead * curvature, -0.999, 0.999))/2.)
   return y_actual, curvature
 
-def draw_path_on(img, speed, angle, color=(0,0,255)):
-    path_x = np.arange(0., 50.1, 0.5)
-    path_y, _ = calc_lookahead_offset(speed, angle, path_x)
+def draw_path_on(img, speed_ms, angle_steers, color=(0,0,255)):
+    path_x = np.arange(0., 20.1, 0.25)
+    path_y, _ = calc_lookahead_offset(speed_ms, angle_steers, path_x)
     draw_path(img, path_x, path_y, color)
 
 
-
-def load_rosbag_data(path, frame_size):
-    while 1:
-        bag = rosbag.Bag(path)
-        nmessages = bag.get_message_count('/center_camera/image_color')
-        i = 0
-        steering_angle, current_wheel_speed, speed = 0, 0, 0
-
-        for topic, msg, t in bag.read_messages(
-            topics=['/vehicle/steering_report',
-                    '/center_camera/image_color',
-                    '/left_camera/image_color',
-                    '/right_camera/image_color']):
-
-            if (topic == '/vehicle/steering_report'):
-                current_steering = msg.steering_wheel_angle
-                current_speed = msg.speed
-            elif (topic == '/center_camera/image_color'):
-                img = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), frame_size).swapaxes(0, 1)  #x[i] = ...
-                steering_angle = current_steering
-                speed = current_speed
-                yield (img, steering_angle, speed)   # (x, y)
-                i += 1
-
-            # elif (topic == '/left_camera/image_color'):
-            #     x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-            #     y[i] = np.array([current_steering + shift]);
-            #     i = i + 1
-            # elif (topic == '/right_camera/image_color'):
-            #     x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-            #     y[i] = np.array([current_steering - shift]);
-            #     i = i + 1
-
-            if i % 100 == 0:
-                print "Loaded image {}/{}".format(i, nmessages)
-            if (i == nmessages):
-                yield (img, steering_angle, speed)
-
-        bag.close()
 
 # TODO - Predict based on the image, the speed, or just get something from an array
 # TODO - May have multiple versions of this function in the end...
@@ -127,21 +130,8 @@ def predict_steering_angle(i, img, speed):
     return 0    # Default to straight ahead for now
 
 
-# Setup pygame
-print "pygame.init()"
-pygame.init()
-scale = 1 #4
-#frame_size = (160, 120)
-frame_size = (640, 480)
-display_size = (frame_size[0] * scale, frame_size[1] * scale)
-print "pygame.display.set_caption()"
-pygame.display.set_caption("SDC Challenge 2 Data Viewer")
-print "pygame.display.set_mode()"
-#screen = pygame.display.set_mode(frame_size, pygame.DOUBLEBUF)
-screen = pygame.display.set_mode(display_size, pygame.DOUBLEBUF)
-print "pygame.surface.Surface()"
-camera_surface = pygame.surface.Surface(frame_size, 0, 24).convert()
-#display_surface = pygame.surface.Surface(display_size, 0, 24).convert()
+# Setup
+frame_size = (320,240)
 
 # Main Loop
 i=0
@@ -152,17 +142,19 @@ for img, steering, speed in load_rosbag_data(path, frame_size):
 
     predicted_steering = predict_steering_angle(i, img, speed)
     draw_path_on(img, speed, steering)
-    #draw_path_on(img, speed, predicted_steering, (0, 255, 0))
+    draw_path_on(img, speed, predicted_steering, (0, 255, 0))
 
     # Display image
-    pygame.surfarray.blit_array(camera_surface, img)
-    scaled_surface = pygame.transform.scale(camera_surface, display_size)
+    cv2.imshow('Udacity challenge 2 - viewer', img)
+    key = cv2.waitKey(30)
 
-    screen.blit(scaled_surface, (0, 0))
-    pygame.display.flip()
+    if key == ord('q'):
+        break
 
     print "{}: Steering angle: {} / Speed: {}".format(i,steering, speed)
     i += 1
+
+cv2.destroyAllWindows()
 
 
 
