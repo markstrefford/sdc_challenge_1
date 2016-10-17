@@ -17,7 +17,33 @@ def get_datafile():
         datasetsDir = "/media/aitor/Data1/"
     return datasetsDir + datafile
     
+def validation_udacity_data(batchsize, path="/media/aitor/Data/udacity/dataset2-clean.bag"):
+    bag = rosbag.Bag(path)
+    x = np.empty([batchsize, 66, 200, 3])
+    y = np.empty([batchsize, 1])
+    cvbridge = CvBridge()
+    
+    i = 0;
+    current_steering = 0
+    for topic,msg,t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color', '/center_camera/image_color/compressed']):
+        if(topic == '/vehicle/steering_report'):
+            current_steering = msg.steering_wheel_angle
+        elif(topic == '/center_camera/image_color'):
+            x[i] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+            y[i] = np.array([current_steering]);
+            i = i + 1
+        elif(topic == '/center_camera/image_color/compressed'):
+            x[i] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+            y[i] = np.array([current_steering]);
+            i = i + 1
+
+        if(i == batchsize):
+            i = 0
+            return (x,y)
+
+    
 def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/dataset3-clean.bag", shift=None):
+    cvbridge = CvBridge()
     #Not shited sequential data generator
     if (shift is None):
         while 1:
@@ -26,17 +52,23 @@ def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/dataset3-c
             y = np.empty([batchsize, 1])
     
             i = 0;
-            for topic,msg,t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color']):
+            current_steering = 0
+            for topic,msg,t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color', '/center_camera/image_color/compressed']):
                 if(topic == '/vehicle/steering_report'):
                     current_steering = msg.steering_wheel_angle
                 elif(topic == '/center_camera/image_color'):
-                    x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                    x[i] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                    y[i] = np.array([current_steering]);
+                    i = i + 1
+                elif(topic == '/center_camera/image_color/compressed'):
+                    x[i] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = np.array([current_steering]);
                     i = i + 1
 
                 if(i == batchsize):
                     i = 0
                     yield (x,y)
+
             bag.close()
     else:
         #Shifted sequential data generator
@@ -47,22 +79,33 @@ def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/dataset3-c
 
             i = 0
             current_steering = 0;
-            for topic,msg,t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color',  '/left_camera/image_color', '/right_camera/image_color']):
+            for topic,msg,t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color',  '/left_camera/image_color', '/right_camera/image_color', '/center_camera/image_color/compressed',  '/left_camera/image_color/compressed', '/right_camera/image_color/compressed']):
                 if(topic == '/vehicle/steering_report'):
                     current_steering = msg.steering_wheel_angle
                 elif(topic == '/center_camera/image_color'):
-                    x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                    x[i] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                    y[i] = np.array([current_steering]);
+                    i = i + 1
+                elif(topic == '/center_camera/image_color/compressed'):
+                    x[i] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = np.array([current_steering]);
                     i = i + 1
                 elif(topic == '/left_camera/image_color'):
-                    x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                    x[i] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = np.array([current_steering + shift]);
                     i = i + 1
+                elif(topic == '/left_camera/image_color/compressed'):
+                    x[i] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                    y[i] = np.array([current_steering]);
+                    i = i + 1
                 elif(topic == '/right_camera/image_color'):
-                    x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                    x[i] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = np.array([current_steering - shift]);
                     i = i + 1
-        
+                elif(topic == '/right_camera/image_color/compressed'):
+                    x[i] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                    y[i] = np.array([current_steering]);
+                    i = i + 1
                 if(i == batchsize):
                     i = 0
                     yield (x, y)
@@ -106,12 +149,12 @@ def clean_rosbag_file(inpath, outpath):
 	with rosbag.Bag(outpath, 'w') as outbag:
          current_speed = 0
          current_steering = 0
-         for topic, msg, t in rosbag.Bag(inpath).read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color']):
+         for topic, msg, t in rosbag.Bag(inpath).read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color', '/center_camera/image_color/compressed']):
             if (topic == '/vehicle/steering_report'):
                 current_speed = msg.speed
                 current_steering = msg.steering_wheel_angle
 
-            if ((current_speed > 8.0) and (abs(current_steering) > 0.05)):
+            if ((current_speed > 8.0) and (abs(current_steering) >= 0.1)):
                 outbag.write(topic, msg, t)
 
 

@@ -12,21 +12,25 @@ import rosbag
 import cv2
 import numpy as np
 from cv_bridge import CvBridge
-from keras.optimizers import Adam
-from keras.callbacks import EarlyStopping                
+from keras.optimizers import SGD
+from keras.callbacks import EarlyStopping          
 
 # Train model--------------------
-model = nnmodel.getNNModel(reg_lambda=10)
-optimizer = Adam()
+model = nnmodel.getNNModel()
+optimizer = SGD(lr=0.001, momentum=0.5, nesterov=True)
 model.compile(optimizer=optimizer, loss="mse")
-stopping_callback = EarlyStopping(patience=5)
+stopping_callback = EarlyStopping(patience=50)
+
+train_generator = utils.udacity_data_generator(128)
+val_data = utils.validation_udacity_data(1024)
 
 model.fit_generator(
-    utils.udacity_data_generator(100, path="/media/aitor/Data/udacity/dataset3-clean.bag"),
-    samples_per_epoch=100,
+    train_generator,
+    samples_per_epoch=128,
     nb_epoch=500,
-    validation_data=utils.udacity_data_generator(100, path="/media/aitor/Data/udacity/dataset2-clean.bag"),
-    callbacks=[stopping_callback]
+    validation_data=val_data,
+    nb_val_samples=1024
+    #callbacks=[stopping_callback]
 )
 #-----------------------------
 
@@ -39,7 +43,7 @@ if response:
 #Show results-----------------
 real_steering = 0
 x = np.empty([1, 66, 200, 3])
-for topic, msg, t in rosbag.Bag("/media/aitor/Data/udacity/dataset-clean.bag").read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color']):
+for topic, msg, t in rosbag.Bag("/media/aitor/Data/udacity/dataset1-clean.bag").read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color']):
 	if(topic == '/vehicle/steering_report'):
 		real_steering = msg.steering_wheel_angle
 	elif(topic == '/center_camera/image_color'):
