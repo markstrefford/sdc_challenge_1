@@ -12,13 +12,15 @@ import rosbag
 import cv2
 import numpy as np
 from cv_bridge import CvBridge
-from keras.optimizers import SGD
+from keras.optimizers import Adam
 from keras.callbacks import EarlyStopping          
+from keras.utils.visualize_util import plot
 
 # Train model--------------------
 model = nnmodel.getNNModel()
-optimizer = SGD(lr=0.0001, decay=1e-6, momentum=0.9, nesterov=True)
+optimizer = Adam()
 model.compile(optimizer, loss="mse")
+plot(model, to_file='model.png')
 stopping_callback = EarlyStopping(patience=50)
 
 train_generator = utils.udacity_data_generator(128, shift=0.2)
@@ -27,7 +29,7 @@ val_data = utils.validation_udacity_data(1024)
 model.fit_generator(
     train_generator,
     samples_per_epoch=128,
-    nb_epoch=864,
+    nb_epoch=10000,
     validation_data=val_data,
     nb_val_samples=1024
     #callbacks=[stopping_callback]
@@ -37,7 +39,7 @@ model.fit_generator(
 #Save it if it is ok-----------
 response = utils.query_yes_no("Training session has finished. Do you want to save the model?")
 if response:
-    model.save("/media/aitor/Data/udacity/model.h5")
+	model.save("/media/aitor/Data/udacity/model.h5")
 #-----------------------------
 
 #Show results-----------------
@@ -47,7 +49,8 @@ for topic, msg, t in rosbag.Bag("/media/aitor/Data/udacity/dataset1-clean.bag").
 	if(topic == '/vehicle/steering_report'):
          real_steering = msg.steering_wheel_angle
 	elif(topic == '/center_camera/image_color'):
-         x[0,:,:,:] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66)).astype("float")
+	 x[0,:,:,:] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
          y = model.predict(x, batch_size=1)
-         print "real: " + str(real_steering) + ", predicted: " + str(y)
+         print "real: " + str(real_steering) + ", predicted: " + str(y)        
+
 #----------------------------

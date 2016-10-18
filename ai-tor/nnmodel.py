@@ -23,44 +23,44 @@ def getNNModel(model_path=None, reg_lambda=0.0):
         ch, width, height = 3, 200, 66
         
         model = Sequential()
-        model.add(Lambda(lambda x: x/127.5 - 1., input_shape=(height, width, ch), output_shape=(height, width, ch)))
-    	
-        model.add(Convolution2D(24, 5, 5, subsample=(2,2), border_mode='same', W_regularizer=l2(reg_lambda), init='he_normal', name='conv1'))
+    	model.add(Lambda(lambda x: x/127.5 - 1., input_shape=(height, width, ch), output_shape=(height, width, ch)))
+        
+	model.add(Convolution2D(24, 5, 5, subsample=(2,2), border_mode='same', init='he_normal', name='conv1'))
         model.add(ELU())
         #model.add(MaxPooling2D((2,2)))
     
-        model.add(Convolution2D(36, 5, 5, subsample=(2,2), border_mode='same', W_regularizer=l2(reg_lambda), init='he_normal', name='conv2'))
-        model.add(ELU())
-        #model.add(MaxPooling2D((2,2), strides=(2,2)))
-        #model.add(MaxPooling2D((2,2)))
-    
-        model.add(Convolution2D(48, 5, 5, subsample=(2,2), border_mode='same', W_regularizer=l2(reg_lambda), init='he_normal', name='conv3'))
+        model.add(Convolution2D(36, 5, 5, subsample=(2,2), border_mode='same', init='he_normal', name='conv2'))
         model.add(ELU())
         #model.add(MaxPooling2D((2,2), strides=(2,2)))
         #model.add(MaxPooling2D((2,2)))
     
-        model.add(Convolution2D(64, 3, 3, border_mode='same', W_regularizer=l2(reg_lambda), init='he_normal', name='conv4'))
+        model.add(Convolution2D(48, 5, 5, subsample=(2,2), border_mode='same', init='he_normal', name='conv3'))
         model.add(ELU())
         #model.add(MaxPooling2D((2,2), strides=(2,2)))
         #model.add(MaxPooling2D((2,2)))
     
-        model.add(Convolution2D(64, 3, 3, border_mode='same', W_regularizer=l2(reg_lambda), init='he_normal', name='conv5'))
+        model.add(Convolution2D(64, 3, 3, border_mode='same', init='he_normal', name='conv4'))
+        model.add(ELU())
+        #model.add(MaxPooling2D((2,2), strides=(2,2)))
+        #model.add(MaxPooling2D((2,2)))
+    
+        model.add(Convolution2D(64, 3, 3, border_mode='same', init='he_normal', name='conv5'))
         #model.add(MaxPooling2D((2,2), strides=(2,2)))
         #model.add(MaxPooling2D((2,2)))
         
         model.add(Flatten())
-        model.add(Dropout(0.2))
         model.add(ELU())
+	model.add(Dropout(0.2))
          
-        model.add(Dense(100, W_regularizer=l2(reg_lambda), init='he_normal', name='dense_1'))
-        model.add(Dropout(0.5))
+        model.add(Dense(100, init='he_normal', name='dense_1'))
         model.add(ELU())
-        model.add(Dense(50, W_regularizer=l2(reg_lambda), init='he_normal', name='dense_2'))
-        model.add(Dropout(0.5))
+	model.add(Dropout(0.5))
+        model.add(Dense(50, init='he_normal', name='dense_2'))
         model.add(ELU())
-        model.add(Dense(10, W_regularizer=l2(reg_lambda), init='he_normal', name='dense_3'))
-        model.add(Dropout(0.5))
+	model.add(Dropout(0.5))
+        model.add(Dense(10, init='he_normal', name='dense_3'))
         model.add(ELU())
-        model.add(Dense(1, W_regularizer=l2(reg_lambda), init='he_normal', name='output'))
-    
+	model.add(Dropout(0.5))
+        model.add(Dense(1, init='he_normal', name='output'))
+
     return model

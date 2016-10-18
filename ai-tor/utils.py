@@ -29,12 +29,12 @@ def validation_udacity_data(batchsize, path="/media/aitor/Data/udacity/dataset2-
         if(topic == '/vehicle/steering_report'):
             current_steering = msg.steering_wheel_angle
         elif(topic == '/center_camera/image_color'):
-            x[i] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66)).astype("float")
-            y[i] = np.array([current_steering]);
+            x[i] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+            y[i] = current_steering
             i = i + 1
         elif(topic == '/center_camera/image_color/compressed'):
-            x[i] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66)).astype("float")
-            y[i] = np.array([current_steering]);
+            x[i] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+            y[i] = current_steering
             i = i + 1
 
         if(i == batchsize):
@@ -57,11 +57,11 @@ def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/dataset3-c
                 if(topic == '/vehicle/steering_report'):
                     current_steering = msg.steering_wheel_angle
                 elif(topic == '/center_camera/image_color'):
-                    x[i,:,:,:] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66)).astype("float")
+                    x[i,:,:,:] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = current_steering;
                     i = i + 1
                 elif(topic == '/center_camera/image_color/compressed'):
-                    x[i,:,:,:] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66)).astype("float")
+                    x[i,:,:,:] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = current_steering;
                     i = i + 1
 
@@ -83,27 +83,27 @@ def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/dataset3-c
                 if(topic == '/vehicle/steering_report'):
                     current_steering = msg.steering_wheel_angle
                 elif(topic == '/center_camera/image_color'):
-                    x[i,:,:,:] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66)).astype("float")
+                    x[i,:,:,:] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = current_steering;
                     i = i + 1
                 elif(topic == '/center_camera/image_color/compressed'):
-                    x[i,:,:,:] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66)).astype("float")
+                    x[i,:,:,:] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = current_steering;
                     i = i + 1
                 elif(topic == '/left_camera/image_color'):
-                    x[i,:,:,:] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66)).astype("float")
+                    x[i,:,:,:] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = current_steering - shift;
                     i = i + 1
                 elif(topic == '/left_camera/image_color/compressed'):
-                    x[i,:,:,:] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66)).astype("float")
+                    x[i,:,:,:] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = current_steering - shift;
                     i = i + 1
                 elif(topic == '/right_camera/image_color'):
-                    x[i,:,:,:] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66)).astype("float")
+                    x[i,:,:,:] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = current_steering + shift;
                     i = i + 1
                 elif(topic == '/right_camera/image_color/compressed'):
-                    x[i,:,:,:] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66)).astype("float")
+                    x[i,:,:,:] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = current_steering + shift;
                     i = i + 1
                 if(i == batchsize):
