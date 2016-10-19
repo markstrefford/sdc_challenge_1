@@ -9,7 +9,6 @@ Created on Thu Oct  6 19:01:55 2016
 from keras.models import Sequential, load_model
 from keras.layers import Flatten, Dense, Dropout, Lambda, ELU
 from keras.layers.convolutional import Convolution2D
-from keras.regularizers import l2
 
 #Based on:
 #   75% NVIDIA's end-to-end paper: https://arxiv.org/pdf/1604.07316v1.pdf
@@ -23,9 +22,9 @@ def getNNModel(model_path=None, reg_lambda=0.0):
         ch, width, height = 3, 200, 66
         
         model = Sequential()
-    	model.add(Lambda(lambda x: x/127.5 - 1., input_shape=(height, width, ch), output_shape=(height, width, ch)))
+        model.add(Lambda(lambda x: x/127.5 - 1., input_shape=(height, width, ch), output_shape=(height, width, ch)))
         
-	model.add(Convolution2D(24, 5, 5, subsample=(2,2), border_mode='same', init='he_normal', name='conv1'))
+        model.add(Convolution2D(24, 5, 5, subsample=(2,2), border_mode='same', init='he_normal', name='conv1'))
         model.add(ELU())
         #model.add(MaxPooling2D((2,2)))
     
@@ -50,17 +49,17 @@ def getNNModel(model_path=None, reg_lambda=0.0):
         
         model.add(Flatten())
         model.add(ELU())
-	model.add(Dropout(0.2))
+        model.add(Dropout(0.2))
          
         model.add(Dense(100, init='he_normal', name='dense_1'))
         model.add(ELU())
-	model.add(Dropout(0.5))
+        model.add(Dropout(0.5))
         model.add(Dense(50, init='he_normal', name='dense_2'))
         model.add(ELU())
-	model.add(Dropout(0.5))
+        model.add(Dropout(0.5))
         model.add(Dense(10, init='he_normal', name='dense_3'))
         model.add(ELU())
-	model.add(Dropout(0.5))
+        model.add(Dropout(0.5))
         model.add(Dense(1, init='he_normal', name='output'))
 
     return model

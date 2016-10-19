@@ -111,6 +111,62 @@ def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/dataset3-c
                     yield (x, y)
         
             bag.close()
+            
+def driving_data_generator(batchsize, path="/media/aitor/Data/driving_dataset/"):
+    while 1:
+        x = np.zeros((batchsize, 66, 200, 3))
+        y = np.zeros(batchsize)
+        i = 0
+        with open(path + "data.txt") as f:
+            for line in f:
+                imagepath = path + line.split()[0]
+                x[i,:,:,:] = cv2.resize(cv2.imread(imagepath), (200, 66))
+                y[i] = float(line.split()[1])*3.14159265359/180.0
+                i = i + 1
+                
+                if(i == batchsize):
+                    i = 0
+                    yield(x,y)
+                    
+                    
+def mixed_data_generator(batchsize):
+    while 1:
+        bag = rosbag.Bag("/media/aitor/Data/udacity/dataset3-clean.bag")
+        cvbridge = CvBridge()
+        x = np.zeros((batchsize, 66, 200, 3))
+        y = np.zeros(batchsize)
+
+        i = 0
+        current_steering = 0
+        for topic,msg,t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color', '/center_camera/image_color/compressed']):
+            if(topic == '/vehicle/steering_report'):
+                current_steering = msg.steering_wheel_angle
+            elif(topic == '/center_camera/image_color'):
+                x[i,:,:,:] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                y[i] = current_steering;
+                i = i + 1
+            elif(topic == '/center_camera/image_color/compressed'):
+                x[i,:,:,:] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                y[i] = current_steering;
+                i = i + 1
+
+            if(i == batchsize):
+                i = 0
+                yield (x,y)
+
+        bag.close()
+        
+        with open("/media/aitor/Data/driving_dataset/data.txt") as f:
+            for line in f:
+                imagepath = "/media/aitor/Data/driving_dataset/" + line.split()[0]
+                x[i,:,:,:] = cv2.resize(cv2.imread(imagepath), (200, 66))
+                y[i] = float(line.split()[1])*3.14159265359/180.0
+                i = i + 1
+                
+                if(i == batchsize):
+                    i = 0
+                    yield(x,y)
+                    
 
 def query_yes_no(question, default="yes"):
     """Ask a yes/no question via raw_input() and return their answer.

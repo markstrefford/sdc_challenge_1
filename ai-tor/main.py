@@ -18,12 +18,12 @@ from keras.utils.visualize_util import plot
 
 # Train model--------------------
 model = nnmodel.getNNModel()
-optimizer = Adam()
+optimizer = Adam(lr=1e-4)
 model.compile(optimizer, loss="mse")
 plot(model, to_file='model.png')
 stopping_callback = EarlyStopping(patience=50)
 
-train_generator = utils.udacity_data_generator(128, shift=0.2)
+train_generator = utils.driving_data_generator(128)
 val_data = utils.validation_udacity_data(1024)
 
 model.fit_generator(
