@@ -23,9 +23,9 @@ from keras.utils.visualize_util import plot
 # Train model--------------------
 model = nnmodel.getNNModel()
 optimizer = 'Adam'
-lr = 0.01
+lr = 0.0001
 methodToCall = getattr(optimizers, optimizer)
-model.compile(optimizer=methodToCall(lr=lr), loss="mse", metrics=['accuracy'])
+model.compile(optimizer=methodToCall(lr=lr), loss="mse")
 plot(model, to_file='model.png')
 stopping_callback = EarlyStopping(patience=80)
 
@@ -34,10 +34,10 @@ val_data = utils.validation_udacity_data(256)
 
 hist = model.fit_generator(
     train_generator,
-    samples_per_epoch=256 * 1000,
+    samples_per_epoch= 50656, # depending on amount of images in dataset
     nb_epoch=30,
     validation_data=val_data,
-    nb_val_samples=256 * 1000
+    nb_val_samples= 50656
     #callbacks=[stopping_callback]
 )
 print hist.history
@@ -47,7 +47,7 @@ print hist.history
 #Save it if it is ok-----------
 response = utils.query_yes_no("Training session has finished. Do you want to save the model?")
 if response:
-	model.save("/home/fabi/sdc/data/model.h5")
+	model.save("/home/fabi/sdc/sdc_challenge_1/dereitel/model.h5")
 #-----------------------------
 
 #Show results-----------------
