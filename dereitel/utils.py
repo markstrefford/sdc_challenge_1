@@ -6,6 +6,7 @@ from cv_bridge import CvBridge
 import sys
 import h5py
 import glob
+from sklearn.utils import shuffle
 
 
 def get_datafile():
@@ -56,21 +57,37 @@ def udacity_data_generator(batchsize, path='/home/fabi/sdc/data/2016-10-10/clean
             i = 0;
             current_steering = 0
             for topic,msg,t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color', '/center_camera/image_color/compressed']):
+                # Load different topics and save in x, y arrays
                 if(topic == '/vehicle/steering_report'):
                     current_steering = msg.steering_wheel_angle
                 elif(topic == '/center_camera/image_color'):
                     x[i,:,:,:] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = current_steering;
                     i = i + 1
+                    if(i < batchsize ): #and np.random.uniform(0, 1) < 0.4
+                        x[i,:,:,:], y[i] = flip_axis(cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66)), y[i], x)
+                        i = i + 1
                 elif(topic == '/center_camera/image_color/compressed'):
                     x[i,:,:,:] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                     y[i] = current_steering;
                     i = i + 1
+                    if(i < batchsize): #  and np.random.uniform(0, 1) < 0.4
+                        x[i,:,:,:], y[i] = flip_axis(cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66)), y[i], x)
+                        i = i + 1
 
-                if(i == batchsize):
-                    i = 0
-                    yield (x,y)
-
+                # Return the batches one by one as requested
+                # Shuffle arrays to prevent overfitting
+                if(i >= batchsize):
+                    x, y = shuffle(x, y, random_state=0) # From sklearn
+                    if(i == batchsize):
+                        i = 0
+                        print y
+                        yield (x,y)
+                    elif(i == batchsize + 1):
+                        i = 0
+                        yield (x[:-1,:,:,:], y[:-1,:,:,:])
+                    elif(i >= batchsize):
+                        print "Check that code again you fool."
             bag.close()
     else:
         #Shifted sequential data generator
@@ -173,3 +190,9 @@ def load_deepdrive_files(filesdir):
             #clear the data to save memory
             # data = None
             yield images, targets
+
+
+def flip_axis(x, y, axis):
+    x = np.fliplr(x)
+    y = -y
+    return x, y
