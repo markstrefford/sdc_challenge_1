@@ -16,20 +16,21 @@ from keras.optimizers import Adam
 from keras.callbacks import EarlyStopping          
 from keras.utils.visualize_util import plot
 
+
 # Train model--------------------
 model = nnmodel.getNNModel()
 optimizer = Adam(lr=1e-4)
 model.compile(optimizer, loss="mse")
 plot(model, to_file='model.png')
-stopping_callback = EarlyStopping(patience=50)
+stopping_callback = EarlyStopping(patience=5)
 
-train_generator = utils.driving_data_generator(128)
+train_generator = utils.udacity_data_generator(337, shift=0.2)
 val_data = utils.validation_udacity_data(1024)
 
 model.fit_generator(
     train_generator,
-    samples_per_epoch=128,
-    nb_epoch=10000,
+    samples_per_epoch=50887*3,
+    nb_epoch=50,
     validation_data=val_data,
     nb_val_samples=1024
     #callbacks=[stopping_callback]
@@ -49,7 +50,7 @@ for topic, msg, t in rosbag.Bag("/media/aitor/Data/udacity/dataset1-clean.bag").
 	if(topic == '/vehicle/steering_report'):
          real_steering = msg.steering_wheel_angle
 	elif(topic == '/center_camera/image_color'):
-	 x[0,:,:,:] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+         x[0,:,:,:] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
          y = model.predict(x, batch_size=1)
          print "real: " + str(real_steering) + ", predicted: " + str(y)        
 

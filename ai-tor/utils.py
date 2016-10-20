@@ -6,6 +6,8 @@ from cv_bridge import CvBridge
 import sys
 import h5py
 import glob
+import matplotlib.pyplot as plt
+
 
 def get_datafile():
     datafile = "dataset.bag"
@@ -201,17 +203,28 @@ def query_yes_no(question, default="yes"):
                              "(or 'y' or 'n').\n")
         
 
-def clean_rosbag_file(inpath, outpath):
-	with rosbag.Bag(outpath, 'w') as outbag:
+################################################################################
+# Cleaning the Data
+################################################################################
+
+def clean_dataset(inpath, outpath):
+    # Clean the rosbag
+    print "start"
+    with rosbag.Bag(outpath, 'w') as outbag:
          current_speed = 0
          current_steering = 0
-         for topic, msg, t in rosbag.Bag(inpath).read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color', '/center_camera/image_color/compressed']):
-            if (topic == '/vehicle/steering_report'):
-                current_speed = msg.speed
-                current_steering = msg.steering_wheel_angle
+         print "opened file"
+         for topic, msg, t in rosbag.Bag(inpath).read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color',  '/left_camera/image_color', '/right_camera/image_color', '/center_camera/image_color/compressed',  '/left_camera/image_color/compressed', '/right_camera/image_color/compressed']):
 
-            if ((current_speed > 8.0) and (abs(current_steering) >= 0.1)):
-                outbag.write(topic, msg, t)
+             if (topic == '/vehicle/steering_report'):
+                 current_speed = msg.speed
+                 current_steering = msg.steering_wheel_angle
+
+             if (current_speed > 8.0):
+                 if (abs(current_steering) >= 0.1):
+                     outbag.write(topic, msg, t)
+                 elif (np.random.uniform(0, 1) < 0.08):
+                     outbag.write(topic, msg, t)
 
 
 def load_deepdrive_files(filesdir):
