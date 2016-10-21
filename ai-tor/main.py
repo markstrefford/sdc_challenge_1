@@ -8,10 +8,6 @@ Created on Thu Oct  6 18:56:59 2016
 
 import nnmodel
 import utils
-import rosbag
-import cv2
-import numpy as np
-from cv_bridge import CvBridge
 from keras.optimizers import Adam
 from keras.callbacks import EarlyStopping          
 from keras.utils.visualize_util import plot
@@ -45,5 +41,5 @@ if response:
 
 #Show results-----------------
    
-
+#TODO: Integrate @marks code
 #----------------------------

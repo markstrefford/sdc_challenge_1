@@ -6,7 +6,8 @@ import numpy as np
 from cv_bridge import CvBridge
 import sys
 
-def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/images3/", list_name="list_shuffled", include_shift=False):
+#TODO: Substitute path by a list of paths
+def udacity_data_generator(batchsize, path="/home/aitor/images3/", list_name="list_shuffled", include_shift=False):
     while 1:
         x = np.zeros((batchsize, 66, 200, 3))
         y = np.zeros(batchsize)
@@ -176,15 +177,9 @@ def clean_dataset(inpath, outpath):
                 current_speed = msg.speed
                 current_steering_msg = msg
                 current_steering = msg.steering_wheel_angle
-<<<<<<< HEAD
                 current_time = t
                 current_topic = topic
-                
-=======
-		current_time = t
-		current_topic = topic
 
->>>>>>> a22af59f2f7c987d4495a865ef1b301709078e04
             elif (current_speed > 8.0): #an image
                 if ((abs(current_steering) >= 0.1) or (r < 0.08)):
                     outbag.write(topic, msg, t)
