@@ -33,11 +33,24 @@ def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/images3/",
 						yield(x,y)
 						
 				except StopIteration:
+					it.close()
 					files.remove(it)
 		
-		center_file.close()
-		left_file.close()
-		right_file.close()
+def shuffle_list(listpath, outpath):
+	listfile = open(listpath)
+	lines = []
+	
+	for line in listfile:
+		lines.append(line)
+		
+	listfile.close()	
+	random.shuffle(lines)
+	
+	outfile = open(outpath)
+	for line in lines:
+  		outfile.write(line + "\n")
+	
+	
 
 def rosbag_to_jpeg(inpath, outpath):
 	cvbridge = CvBridge()
