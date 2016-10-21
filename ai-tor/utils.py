@@ -49,7 +49,7 @@ def shuffle_list(listpath, outpath):
 	
 	outfile = open(outpath, "w")
 	for line in lines:
-  		outfile.write(line + "\n")
+  		outfile.write(line)
 	outfile.close()
 	
 	

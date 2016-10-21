@@ -20,7 +20,7 @@ import rosbag
 #utils.rosbag_to_jpeg("/media/aitor/Data/udacity/dataset3-clean.bag", "/media/aitor/Data/udacity/images3/")
 
 utils.shuffle_list("/media/aitor/Data/udacity/images1/center_camera/list.txt", "/media/aitor/Data/udacity/images1/center_camera/list_shuffled.txt")
-utils.shuffle_list("/media/aitor/Data/udacity/images2/center_camera/list.txt", "/media/aitor/Data/udacity/images3/center_camera/list_shuffled.txt")
+utils.shuffle_list("/media/aitor/Data/udacity/images2/center_camera/list.txt", "/media/aitor/Data/udacity/images2/center_camera/list_shuffled.txt")
 utils.shuffle_list("/media/aitor/Data/udacity/images3/center_camera/list.txt", "/media/aitor/Data/udacity/images3/center_camera/list_shuffled.txt")
 utils.shuffle_list("/media/aitor/Data/udacity/images1/left_camera/list.txt", "/media/aitor/Data/udacity/images1/left_camera/list_shuffled.txt")
 utils.shuffle_list("/media/aitor/Data/udacity/images2/left_camera/list.txt", "/media/aitor/Data/udacity/images2/left_camera/list_shuffled.txt")
