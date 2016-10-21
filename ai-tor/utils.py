@@ -47,7 +47,7 @@ def shuffle_list(listpath, outpath):
 	listfile.close()	
 	random.shuffle(lines)
 	
-	outfile = open(outpath)
+	outfile = open(outpath, "w")
 	for line in lines:
   		outfile.write(line + "\n")
 	outfile.close()
