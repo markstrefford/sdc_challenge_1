@@ -44,32 +44,32 @@ def rosbag_to_jpeg(inpath, outpath):
 			if (topic == '/center_camera/image_color'):
 				img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
 				cv2.imwrite(center_camera_path + str(center_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-				center_file.write(str(center_i) + "," + str(current_steering))
+				center_file.write(str(center_i) + "," + str(current_steering) + "\n")
 				center_i = center_i + 1
 			elif (topic == '/left_camera/image_color'):
 				img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
 				cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-				left_file.write(str(left_i) + "," + str(current_steering))
+				left_file.write(str(left_i) + "," + str(current_steering) + "\n")
 				left_i = left_i + 1
 			elif (topic == '/right_camera/image_color'):
 				img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
 				cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-				right_file.write(str(right_i) + "," + str(current_steering))
+				right_file.write(str(right_i) + "," + str(current_steering) + "\n")
 				right_i = right_i + 1
                         elif (topic == '/center_camera/image_color/compressed'):
                                 img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                                 cv2.imwrite(center_camera_path + str(center_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                                center_file.write(str(center_i) + "," + str(current_steering))
+                                center_file.write(str(center_i) + "," + str(current_steering) + "\n")
                                 center_i = center_i + 1
                         elif (topic == '/left_camera/image_color/compressed'):
                                 img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                                 cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                                left_file.write(str(left_i) + "," + str(current_steering))
+                                left_file.write(str(left_i) + "," + str(current_steering) + "\n")
                                 left_i = left_i + 1
                         elif (topic == '/right_camera/image_color/compressed'):
                                 img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                                 cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                                right_file.write(str(right_i) + "," + str(current_steering))
+                                right_file.write(str(right_i) + "," + str(current_steering) + "\n")
                                 right_i = right_i + 1
 
 	bag.close()
