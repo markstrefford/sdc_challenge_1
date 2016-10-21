@@ -24,12 +24,12 @@ model.compile(optimizer, loss="mse")
 plot(model, to_file='model.png')
 stopping_callback = EarlyStopping(patience=5)
 
-train_generator = utils.udacity_data_generator(337, shift=0.2)
+train_generator = utils.udacity_data_generator(251)
 val_data = utils.validation_udacity_data(1024)
 
 model.fit_generator(
     train_generator,
-    samples_per_epoch=50887*3,
+    samples_per_epoch=36897,
     nb_epoch=50,
     validation_data=val_data,
     nb_val_samples=1024
@@ -46,12 +46,14 @@ if response:
 #Show results-----------------
 real_steering = 0
 x = np.zeros((1, 66, 200, 3))
+real_steering = None
 for topic, msg, t in rosbag.Bag("/media/aitor/Data/udacity/dataset1-clean.bag").read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color']):
 	if(topic == '/vehicle/steering_report'):
          real_steering = msg.steering_wheel_angle
-	elif(topic == '/center_camera/image_color'):
+	elif(real_steering is not None):
          x[0,:,:,:] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
          y = model.predict(x, batch_size=1)
-         print "real: " + str(real_steering) + ", predicted: " + str(y)        
+         print "real: " + str(real_steering) + ", predicted: " + str(y)
+	 real_steering = None        
 
 #----------------------------
