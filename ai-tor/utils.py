@@ -1,5 +1,6 @@
 import os
 import rospy
+import random
 import rosbag
 import cv2
 import numpy as np
