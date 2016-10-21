@@ -1,41 +1,39 @@
 import os
-import rospy
 import random
 import rosbag
 import cv2
 import numpy as np
 from cv_bridge import CvBridge
 import sys
-import h5py
-import glob
-import matplotlib.pyplot as plt
 
 def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/images3/", list_name="list_shuffled", include_shift=False):
-	while 1:
-		files = [open(path + "center_camera/" + list_name + ".txt")]
+    while 1:
+        x = np.zeros((batchsize, 66, 200, 3))
+        y = np.zeros(batchsize)
+        files = [open(path + "center_camera/" + list_name + ".txt")]
 		
-		if include_shift:
-			files.append(open(path + "left_camera/" + list_name + ".txt"))
-			files.append(open(path + "right_camera/" + list_name + ".txt"))
+        if include_shift:
+            files.append(open(path + "left_camera/" + list_name + ".txt"))
+            files.append(open(path + "right_camera/" + list_name + ".txt"))
 	
-		i = 0
-		files = map(iter, files)
-		while files:
-			for it in files:
-				try:
-					line = it.next()
-					imagepath = os.path.dirname(it.name) + "/" + line.split()[0] + ".jpg"
-                			x[i,:,:,:] = cv2.resize(cv2.imread(imagepath), (200, 66))
-                			y[i] = float(line.split()[1])
-					i = i + 1
+        i = 0
+        files = map(iter, files)
+        while files:
+            for it in files:
+                try:
+                    line = it.next()
+                    imagepath = os.path.dirname(it.name) + "/" + line.split()[0] + ".jpg"
+                    x[i,:,:,:] = cv2.imread(imagepath)
+                    y[i] = float(line.split()[1])
+                    i = i + 1
 					
-					if(i == batchsize):
-						i = 0
-						yield(x,y)
-						
-				except StopIteration:
-					it.close()
-					files.remove(it)
+                    if(i == batchsize):
+                        i = 0
+                        yield(x,y)
+		
+                except StopIteration:
+                    it.close()
+                    files.remove(it)
 		
 def shuffle_list(listpath, outpath):
 	listfile = open(listpath)
@@ -177,8 +175,8 @@ def clean_dataset(inpath, outpath):
                 current_speed = msg.speed
                 current_steering_msg = msg
                 current_steering = msg.steering_wheel_angle
-		current_time = t
-		current_topic = topic
+                current_time = t
+                current_topic = topic
                 
             elif (current_speed > 8.0): #an image
                 if ((abs(current_steering) >= 0.1) or (r < 0.08)):
@@ -188,5 +186,5 @@ def clean_dataset(inpath, outpath):
                     if (j == 3): #one steering angle for every 3 images (left, right and center camera)
                         outbag.write(current_topic, current_steering_msg, current_time)
                         r = np.random.uniform(0,1)
-			current_speed = 0
+                        current_speed = 0
                         j = 0
