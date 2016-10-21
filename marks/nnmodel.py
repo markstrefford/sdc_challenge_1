@@ -27,7 +27,7 @@ def getNNModel(model_path=None, reg_lambda=0.0):
 
         model.add(Convolution2D(24, 5, 5, subsample=(2,2), border_mode='same', W_regularizer=l2(reg_lambda), init='he_normal', name='conv1'))
         model.add(ELU())
-        model.add(MaxPooling2D((2,2)))
+        #model.add(MaxPooling2D((2,2)))
 
         model.add(Convolution2D(36, 5, 5, subsample=(2,2), border_mode='same', W_regularizer=l2(reg_lambda), init='he_normal', name='conv2'))
         model.add(ELU())

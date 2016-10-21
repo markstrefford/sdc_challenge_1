@@ -7,17 +7,18 @@ import cv2
 import numpy as np
 import time
 #from keras.applications import vgg16
-from mynn import custom_keras_model
+from nnmodel import getNNModel
 from keras import backend as K
 from skimage.viewer import ImageViewer
 
-# dimensions of the generated pictures for each filter.
-img_width = 224
-img_height = 224
-
 # the name of the layer we want to visualize
 # (see model definition at keras/applications/vgg16.py)
-layer_name = 'dropout_1'
+layer_name = 'conv5'
+num_filters = 64
+
+# dimensions of the generated pictures for each filter.
+img_width = 66
+img_height = 200
 
 # util function to convert a tensor into a valid image
 def deprocess_image(x):
@@ -39,7 +40,7 @@ def deprocess_image(x):
 
 # build the VGG16 network with ImageNet weights
 #model = vgg16.VGG16(weights='imagenet', include_top=False)
-model, _ = custom_keras_model(weights_path='../model/custom_keras_model.h5', num_classes=10, include_top=False)
+model = getNNModel(model_path='../ai-tor/model.h5')
 print('Model loaded.')
 
 model.summary()
@@ -57,7 +58,7 @@ def normalize(x):
 
 
 kept_filters = []
-for filter_index in range(0, 7):
+for filter_index in range(num_filters):
     # we only scan through the first 200 filters,
     # but there are actually 512 of them
     print('Processing filter %d' % filter_index)
@@ -108,7 +109,7 @@ for filter_index in range(0, 7):
     print('Filter %d processed in %ds' % (filter_index, end_time - start_time))
 
 # we will stich the best 64 filters on a 8 x 8 grid.
-n = min(len(kept_filters), 8)
+n = min(len(kept_filters), num_filters)
 m = 1   # TODO - Make this flexible to the numbers of filters kept!
 
 # the filters that have the highest loss are assumed to be better-looking.
