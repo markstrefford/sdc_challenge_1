@@ -11,21 +11,30 @@ import matplotlib.pyplot as plt
 
 def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/images3/", list_name="list_shuffled", include_shift=False):
 	while 1:
-		center_file = open(path + "center_camera/" + list_name + ".txt")
-		left_file = open(path + "left_camera/" + list_name + ".txt")
-		right_file = open(path + "right_camera/" + list_name + ".txt")
+		files = [open(path + "center_camera/" + list_name + ".txt")]
+		
+		if include_shift:
+			files.append(open(path + "left_camera/" + list_name + ".txt"))
+			files.append(open(path + "right_camera/" + list_name + ".txt"))
 	
 		i = 0
-		for line in center_file:
-			imagepath = path + "center_camera/" + line.split()[0] + ".jpg"
-                	x[i,:,:,:] = cv2.resize(cv2.imread(imagepath), (200, 66))
-                	y[i] = float(line.split()[1])
-			i = i + 1
+		files = map(iter, files)
+		while files:
+			for it in files:
+				try:
+					line = it.next()
+					imagepath = os.path.dirname(it.name) + "/" + line.split()[0] + ".jpg"
+                			x[i,:,:,:] = cv2.resize(cv2.imread(imagepath), (200, 66))
+                			y[i] = float(line.split()[1])
+					i = i + 1
+					
+					if(i == batchsize):
+						i = 0
+						yield(x,y)
+						
+				except StopIteration:
+					files.remove(it)
 		
-			if(i == batchsize)
-				i = 0
-				yield (x, y)
-	
 		center_file.close()
 		left_file.close()
 		right_file.close()
