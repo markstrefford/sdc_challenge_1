@@ -23,22 +23,22 @@ from keras.utils.visualize_util import plot
 # Train model--------------------
 model = nnmodel.getNNModel()
 optimizer = 'Adam'
-lr = 0.0001
+lr = 0.0005
 methodToCall = getattr(optimizers, optimizer)
 model.compile(optimizer=methodToCall(lr=lr), loss="mse")
 plot(model, to_file='model.png')
-stopping_callback = EarlyStopping(patience=5)
+stopping_callback = EarlyStopping(patience=10)
 
-train_generator = utils.udacity_data_generator(256)
-val_data = utils.validation_udacity_data(256)
+train_generator = utils.udacity_data_generator(512)
+val_data = utils.validation_udacity_data(512)
 
 hist = model.fit_generator(
     train_generator,
-    samples_per_epoch= 50656, # depending on amount of images in dataset
+    samples_per_epoch= 2 * 50688, # depending on amount of images in dataset
     nb_epoch=1000,
     validation_data=val_data,
-    nb_val_samples= 50656,
-    callbacks=[stopping_callback]
+    nb_val_samples= 2 * 50688
+    #callbacks=[stopping_callback]
 )
 print hist.history
 
