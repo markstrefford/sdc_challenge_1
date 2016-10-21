@@ -9,6 +9,27 @@ import h5py
 import glob
 import matplotlib.pyplot as plt
 
+def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/images3/", list_name="list_shuffled", include_shift=False):
+	while 1:
+		center_file = open(path + "center_camera/" + list_name + ".txt")
+		left_file = open(path + "left_camera/" + list_name + ".txt")
+		right_file = open(path + "right_camera/" + list_name + ".txt")
+	
+		i = 0
+		for line in center_file:
+			imagepath = path + "center_camera/" + line.split()[0] + ".jpg"
+                	x[i,:,:,:] = cv2.resize(cv2.imread(imagepath), (200, 66))
+                	y[i] = float(line.split()[1])
+			i = i + 1
+		
+			if(i == batchsize)
+				i = 0
+				yield (x, y)
+	
+		center_file.close()
+		left_file.close()
+		right_file.close()
+
 def rosbag_to_jpeg(inpath, outpath):
 	cvbridge = CvBridge()
 	bag = rosbag.Bag(inpath)
@@ -44,200 +65,39 @@ def rosbag_to_jpeg(inpath, outpath):
 			if (topic == '/center_camera/image_color'):
 				img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
 				cv2.imwrite(center_camera_path + str(center_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-				center_file.write(str(center_i) + "," + str(current_steering) + "\n")
+				center_file.write(str(center_i) + " " + str(current_steering) + "\n")
 				center_i = center_i + 1
 			elif (topic == '/left_camera/image_color'):
 				img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
 				cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-				left_file.write(str(left_i) + "," + str(current_steering) + "\n")
+				left_file.write(str(left_i) + " " + str(current_steering) + "\n")
 				left_i = left_i + 1
 			elif (topic == '/right_camera/image_color'):
 				img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
 				cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-				right_file.write(str(right_i) + "," + str(current_steering) + "\n")
+				right_file.write(str(right_i) + " " + str(current_steering) + "\n")
 				right_i = right_i + 1
                         elif (topic == '/center_camera/image_color/compressed'):
                                 img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                                 cv2.imwrite(center_camera_path + str(center_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                                center_file.write(str(center_i) + "," + str(current_steering) + "\n")
+                                center_file.write(str(center_i) + " " + str(current_steering) + "\n")
                                 center_i = center_i + 1
                         elif (topic == '/left_camera/image_color/compressed'):
                                 img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                                 cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                                left_file.write(str(left_i) + "," + str(current_steering) + "\n")
+                                left_file.write(str(left_i) + " " + str(current_steering) + "\n")
                                 left_i = left_i + 1
                         elif (topic == '/right_camera/image_color/compressed'):
                                 img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                                 cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                                right_file.write(str(right_i) + "," + str(current_steering) + "\n")
+                                right_file.write(str(right_i) + " " + str(current_steering) + "\n")
                                 right_i = right_i + 1
 
 	bag.close()
 	center_file.close()
 	right_file.close()
 	left_file.close()
-				 
-
-	
-    
-def validation_udacity_data(batchsize, path="/media/aitor/Data/udacity/dataset2-clean.bag"):
-    bag = rosbag.Bag(path)
-    x = np.zeros((batchsize, 66, 200, 3))
-    y = np.zeros(batchsize)
-    cvbridge = CvBridge()
-    
-    i = 0
-    current_steering = None
-    for topic,msg,t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color', '/center_camera/image_color/compressed']):
-        if(topic == '/vehicle/steering_report'):
-            current_steering = msg.steering_wheel_angle
-            
-            
-        elif(current_steering is not None):
-            if(topic == '/center_camera/image_color'):
-                img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-            elif(topic == '/center_camera/image_color/compressed'):
-                img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-            
-            x[i,:,:,:] = img
-            y[i] = current_steering
-	    current_steering = None
-            i = i + 1
-
-        if(i == batchsize):
-            i = 0
-            return (x,y)
-            
-    bag.close()
-
-    
-def udacity_data_generator(batchsize, path="/media/aitor/Data/udacity/dataset3-clean.bag", shift=None):
-    cvbridge = CvBridge()
-    #Not shited sequential data generator
-    if (shift is None):
-        while 1:
-	    print 'started'
-            bag = rosbag.Bag(path)
-            x = np.zeros((batchsize, 66, 200, 3))
-            y = np.zeros(batchsize)
-            cvbridge = CvBridge()
-            
-            i = 0
-            current_steering = None
-	    print 'started reading messages'
-            for topic,msg,t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color', '/center_camera/image_color/compressed']):
-		if(topic == '/vehicle/steering_report'):
-                    current_steering = msg.steering_wheel_angle      
-                    print 'steering msg'
-                elif(current_steering is not None):
-		    print 'image msg'
-                    if(topic == '/center_camera/image_color'):
-                        img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                    elif(topic == '/center_camera/image_color/compressed'):
-                        img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                    
-                    x[i,:,:,:] = img
-                    y[i] = current_steering
-		    current_steering = None
-		    print str(i)
-                    i = i+1               
-        
-                if(i == batchsize):
-                    i = 0
-                    yield (x,y)
-                    
-            bag.close()
-    else:
-        #Shifted sequential data generator
-        while 1:
-            bag = rosbag.Bag(path)
-            x = np.zeros((batchsize, 66, 200, 3))
-            y = np.zeros(batchsize)
-            cvbridge = CvBridge()
-            
-            i = 0
-            j = 0
-            current_steering = None
-            for topic,msg,t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color',  '/left_camera/image_color', '/right_camera/image_color', '/center_camera/image_color/compressed',  '/left_camera/image_color/compressed', '/right_camera/image_color/compressed']):
-                if(topic == '/vehicle/steering_report'):
-                    current_steering = msg.steering_wheel_angle
-                    
-                elif(current_steering is not None):
-                    if(topic == '/center_camera/image_color' or topic == '/left_camera/image_color' or topic == '/right_camera/image_color'):
-                        img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                    elif(topic == '/center_camera/image_color/compressed' or topic == '/left_camera/image_color/compressed' or topic=='/right_camera/image_color/compressed'):
-                        img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                    
-                    x[i,:,:,:] = img
-                    y[i] = current_steering;
-                    i = i+1
-                    j = j+1
-                    if (j == 3):
-                        current_steering = None
-                        j = 0
-              	
-                if(i == batchsize):
-                    i = 0
-                    j = 0
-                    current_steering = None
-                    yield (x,y)
-                    
-            bag.close()
-            
-def driving_data_generator(batchsize, path="/media/aitor/Data/driving_dataset/"):
-    while 1:
-        x = np.zeros((batchsize, 66, 200, 3))
-        y = np.zeros(batchsize)
-        i = 0
-        with open(path + "data.txt") as f:
-            for line in f:
-                imagepath = path + line.split()[0]
-                x[i,:,:,:] = cv2.resize(cv2.imread(imagepath), (200, 66))
-                y[i] = float(line.split()[1])*3.14159265359/180.0
-                i = i + 1
-                
-                if(i == batchsize):
-                    i = 0
-                    yield(x,y)
-                    
-                    
-def mixed_data_generator(batchsize):
-    while 1:
-        bag = rosbag.Bag("/media/aitor/Data/udacity/dataset3-clean.bag")
-        cvbridge = CvBridge()
-        x = np.zeros((batchsize, 66, 200, 3))
-        y = np.zeros(batchsize)
-
-        i = 0
-        current_steering = 0
-        for topic,msg,t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color', '/center_camera/image_color/compressed']):
-            if(topic == '/vehicle/steering_report'):
-                current_steering = msg.steering_wheel_angle
-            elif(topic == '/center_camera/image_color'):
-                x[i,:,:,:] = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                y[i] = current_steering;
-                i = i + 1
-            elif(topic == '/center_camera/image_color/compressed'):
-                x[i,:,:,:] = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                y[i] = current_steering;
-                i = i + 1
-
-            if(i == batchsize):
-                i = 0
-                yield (x,y)
-
-        bag.close()
-        
-        with open("/media/aitor/Data/driving_dataset/data.txt") as f:
-            for line in f:
-                imagepath = "/media/aitor/Data/driving_dataset/" + line.split()[0]
-                x[i,:,:,:] = cv2.resize(cv2.imread(imagepath), (200, 66))
-                y[i] = float(line.split()[1])*3.14159265359/180.0
-                i = i + 1
-                
-                if(i == batchsize):
-                    i = 0
-                    yield(x,y)
+			
                     
 
 def query_yes_no(question, default="yes"):
@@ -306,18 +166,3 @@ def clean_dataset(inpath, outpath):
                         r = np.random.uniform(0,1)
 			current_speed = 0
                         j = 0
-
-
-def load_deepdrive_files(filesdir):
-    #each file is considered as a batch of data
-    dfiles = glob.glob(filesdir + "/*.h5")
-    for dfile in dfiles:
-        with h5py.File(dfile, 'r') as h5f:
-            data = dict(h5f.items())
-            #convert from float32 to uint8
-            images = np.array(data['images'].value, dtype=np.uint8)
-            targets = np.array(data['targets'].value)
-            #vehicle_states = np.array(data['vehicle_states'].value)
-            #clear the data to save memory
-            # data = None
-            yield images, targets
