@@ -102,3 +102,4 @@ ENV/
 # Temporary data
 .ipynb_checkpoints/
 
+*.jpg
