@@ -21,7 +21,8 @@ plot(model, to_file='model.png')
 stopping_callback = EarlyStopping(patience=5)
 
 train_paths = ["/home/aitor/udacity/center_camera/list_shuffled.txt", "/home/aitor/udacity/left_camera/list_shuffled.txt", "/home/aitor/udacity/right_camera/list_shuffled.txt"]
-#TODO generate validation lists
+val_paths = ["/home/aitor/udacity/center_camera/list_shuffled_val.txt", "/home/aitor/udacity/left_camera/list_shuffled_val.txt", "/home/aitor/udacity/right_camera/list_shuffled_val.txt"]
+
 train_generator = utils.udacity_data_generator(241, train_paths)
 val_data = utils.udacity_data_generator(1024, val_paths)
 
@@ -42,6 +43,5 @@ if response:
 #-----------------------------
 
 #Show results-----------------
-   
-#TODO: Integrate @marks code
+utils.run_test_viewer(model)
 #----------------------------
