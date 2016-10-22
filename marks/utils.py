@@ -63,11 +63,11 @@ def shuffle_list(listpath, outpath):
 ################################################################################
 def rosbag_to_jpeg(bagslist, outpath):
     cvbridge = CvBridge()
-
+ 
     left_camera_path = outpath + "left_camera/"
     right_camera_path = outpath + "right_camera/"
     center_camera_path = outpath + "center_camera/"
-
+ 
     if not os.path.exists(outpath):
         os.makedirs(outpath)
 
@@ -79,11 +79,11 @@ def rosbag_to_jpeg(bagslist, outpath):
 
     if not os.path.exists(center_camera_path):
         os.makedirs(center_camera_path)
-
+  
     center_file = open(center_camera_path + "list.txt", 'w')
     right_file = open(right_camera_path + "list.txt", 'w')
     left_file = open(left_camera_path + "list.txt", 'w')
-
+  
     center_i = 0
     left_i = 0
     right_i = 0
@@ -96,7 +96,7 @@ def rosbag_to_jpeg(bagslist, outpath):
                 if (topic == '/vehicle/steering_report'):
                     current_steering = msg.steering_wheel_angle
                     current_speed = msg.speed
-
+           
                 if (current_steering != -1):
                      if (topic == '/center_camera/image_color'):
                         img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
@@ -106,12 +106,12 @@ def rosbag_to_jpeg(bagslist, outpath):
                      elif (topic == '/left_camera/image_color'):
                         img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                         cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)) + " " + str(current_speed) + "\n")
+                        left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)[0]) + " " + str(current_speed) + "\n")
                         left_i = left_i + 1
                      elif (topic == '/right_camera/image_color'):
                         img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                         cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)) + " " + str(current_speed) + "\n")
+                        right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)[0]) + " " + str(current_speed) + "\n")
                         right_i = right_i + 1
                      elif (topic == '/center_camera/image_color/compressed'):
                         img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
@@ -121,16 +121,16 @@ def rosbag_to_jpeg(bagslist, outpath):
                      elif (topic == '/left_camera/image_color/compressed'):
                         img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                         cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)) + " " + str(current_speed) + "\n")
+                        left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)[0]) + " " + str(current_speed) + "\n")
                         left_i = left_i + 1
                      elif (topic == '/right_camera/image_color/compressed'):
                         img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                         cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)) + " " + str(current_speed) + "\n")
+                        right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)[0]) + " " + str(current_speed) + "\n")
                         right_i = right_i + 1
-
+        
         bag.close()
-
+        
     center_file.close()
     right_file.close()
     left_file.close()
