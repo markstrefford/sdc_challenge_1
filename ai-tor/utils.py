@@ -101,7 +101,7 @@ def prepare_dataset(bagslist, outpath, min_speed = 8, min_angle = 0.1, straight_
                 else:
                     noSkip = not noSkip #reduces sample rate to half (20 - 10 Hz)
                     
-                    if(noSkip and ((abs(current_steering) > min_angle) and (current_speed > min_speed) or (r < straight_road_prob))):
+                    if(noSkip and (((abs(current_steering) > min_angle) or (r < 0.2)) and (current_speed > min_speed))):
                         
                         if (topic == '/center_camera/image_color'):
                             img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
