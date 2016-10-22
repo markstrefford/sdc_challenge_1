@@ -6,15 +6,12 @@ Created on Sun Oct  9 10:38:10 2016
 """
 import utils
 
-#print bag.get_message_count('/left_camera/image_color')
-#print bag.get_message_count('/right_camera/image_color')
+utils.clean_dataset("/media/aitor/Data/udacity/dataset1.bag", "/media/aitor/Data/udacity/dataset1-clean.bag")
+utils.clean_dataset("/media/aitor/Data/udacity/dataset2.bag", "/media/aitor/Data/udacity/dataset2-clean.bag")
+utils.clean_dataset("/media/aitor/Data/udacity/dataset3.bag", "/media/aitor/Data/udacity/dataset3-clean.bag")
+utils.clean_dataset("/media/aitor/Data/udacity/dataset4.bag", "/media/aitor/Data/udacity/dataset4-clean.bag")
 
-#utils.crop_rosbag_file("/media/aitor/Data/udacity/dataset.bag", "/media/aitor/Data/udacity/dataset-croped.bag", 1700)
-#utils.clean_dataset("/media/aitor/Data/udacity/dataset1.bag", "/media/aitor/Data/udacity/dataset1-clean.bag")
-#utils.clean_dataset("/media/aitor/Data/udacity/dataset2.bag", "/media/aitor/Data/udacity/dataset2-clean.bag")
-#utils.clean_dataset("/media/aitor/Data/udacity/dataset3.bag", "/media/aitor/Data/udacity/dataset3-clean.bag")
-
-utils.rosbag_to_jpeg(["/media/aitor/Data/udacity/dataset1-clean.bag", "/media/aitor/Data/udacity/dataset2-clean.bag", "/home/aitor/Data/udacity/dataset3-clean.bag"], "/home/aitor/udacity/")
+utils.rosbag_to_jpeg(["/media/aitor/Data/udacity/dataset1-clean.bag", "/media/aitor/Data/udacity/dataset2-clean.bag", "/media/aitor/Data/udacity/dataset3-clean.bag", "/media/aitor/Data/udacity/dataset4-clean.bag"], "/home/aitor/udacity/")
 
 utils.shuffle_list("/home/aitor/udacity/center_camera/list.txt", "/home/aitor/udacity/center_camera/list_shuffled.txt")
 utils.shuffle_list("/home/aitor/udacity/right_camera/list.txt", "/home/aitor/udacity/right_camera/list_shuffled.txt")

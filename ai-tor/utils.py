@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from cv_bridge import CvBridge
 import sys
+import scipy
 
 def udacity_data_generator(batchsize, paths):
     while 1:
@@ -96,12 +97,12 @@ def rosbag_to_jpeg(bagslist, outpath):
                      elif (topic == '/left_camera/image_color'):
                         img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                         cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        left_file.write(str(left_i) + " " + str(current_steering) + " " + str(current_speed) + "\n")
+                        left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)) + " " + str(current_speed) + "\n")
                         left_i = left_i + 1
                      elif (topic == '/right_camera/image_color'):
                         img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                         cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        right_file.write(str(right_i) + " " + str(current_steering) + " " + str(current_speed) + "\n")
+                        right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)) + " " + str(current_speed) + "\n")
                         right_i = right_i + 1
                      elif (topic == '/center_camera/image_color/compressed'):
                         img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
@@ -111,12 +112,12 @@ def rosbag_to_jpeg(bagslist, outpath):
                      elif (topic == '/left_camera/image_color/compressed'):
                         img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                         cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        left_file.write(str(left_i) + " " + str(current_steering) + " " + str(current_speed) + "\n")
+                        left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)) + " " + str(current_speed) + "\n")
                         left_i = left_i + 1
                      elif (topic == '/right_camera/image_color/compressed'):
                         img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
                         cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        right_file.write(str(right_i) + " " + str(current_steering) + " " + str(current_speed) + "\n")
+                        right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)) + " " + str(current_speed) + "\n")
                         right_i = right_i + 1
         
         bag.close()
@@ -184,7 +185,7 @@ def clean_dataset(inpath, outpath):
                 current_topic = topic
 
             elif (current_speed > 8.0): #an image
-                if ((abs(current_steering) >= 0.1) or (r < 0.08)):
+                if ((abs(current_steering) >= 0.1) or (r < 0.2)):
                     outbag.write(topic, msg, t)
                     j = j + 1
 
@@ -193,3 +194,13 @@ def clean_dataset(inpath, outpath):
                         r = np.random.uniform(0,1)
                         current_speed = 0
                         j = 0
+
+
+def calculate_angle_from_shift(shift, speed, steer_ratio = 14.8, wheel_base = 2.85, dt = 1.5):
+    #shift (m), v (m/s), dt (s)
+    def F(x):
+        phi_o = np.pi/2.0
+        return (speed*dt/wheel_base)*np.sin(x) + x + phi_o - np.arccos(shift / (speed*dt))
+
+    wheel_angle = scipy.optimize.broyden1(F, [0.1], f_tol=1e-5)
+    return steer_ratio*wheel_angle  #rad
