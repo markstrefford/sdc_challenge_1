@@ -92,50 +92,49 @@ def prepare_dataset(bagslist, outpath, min_speed = 8, min_angle = 0.1, straight_
         current_steering = -1
         current_speed = 0
         noSkip = True
-        r = np.random.uniform(0,1)
         for topic, msg, t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color', '/left_camera/image_color', '/right_camera/image_color', '/center_camera/image_color/compressed', '/left_camera/image_color/compressed', '/right_camera/image_color/compressed']):
                 if (topic == '/vehicle/steering_report'):
                     current_steering = msg.steering_wheel_angle
                     current_speed = msg.speed
            
                 else:
-                    noSkip = not noSkip #reduces sample rate to half (20 - 10 Hz)
                     
-                    if(noSkip and (((abs(current_steering) > min_angle) or (r < 0.2)) and (current_speed > min_speed))):
-                        
-                        if (topic == '/center_camera/image_color'):
-                            img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                            cv2.imwrite(center_camera_path + str(center_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                            center_file.write(str(center_i) + " " + str(current_steering) + " " + str(current_speed) + "\n")
-                            center_i = center_i + 1
-                            r = np.random.uniform(0,1)
-                        elif (topic == '/left_camera/image_color'):
-                            img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                            cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                            left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)) + " " + str(current_speed) + "\n")
-                            left_i = left_i + 1
-                        elif (topic == '/right_camera/image_color'):
-                            img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                            cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                            right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)) + " " + str(current_speed) + "\n")
-                            right_i = right_i + 1
-                        elif (topic == '/center_camera/image_color/compressed'):
-                            img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                            cv2.imwrite(center_camera_path + str(center_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                            center_file.write(str(center_i) + " " + str(current_steering) + " " + str(current_speed) + "\n")
-                            center_i = center_i + 1
-                            r = np.random.uniform(0,1)
-                        elif (topic == '/left_camera/image_color/compressed'):
-                            img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                            cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                            left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)) + " " + str(current_speed) + "\n")
-                            left_i = left_i + 1
-                        elif (topic == '/right_camera/image_color/compressed'):
-                            img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                            cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                            right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)) + " " + str(current_speed) + "\n")
-                            right_i = right_i + 1
-        
+                    if (current_speed > min_speed):
+                        noSkip = not noSkip #reduces sample rate to half (20 - 10 Hz)
+                        r = np.random.uniform(0,1)
+                        if(noSkip and ((abs(current_steering) > min_angle) or (r < 0.08))):
+                            
+                            if (topic == '/center_camera/image_color'):
+                                img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                                cv2.imwrite(center_camera_path + str(center_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                                center_file.write(str(center_i) + " " + str(current_steering) + " " + str(current_speed) + "\n")
+                                center_i = center_i + 1
+                            elif (topic == '/left_camera/image_color'):
+                                img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                                cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                                left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)) + " " + str(current_speed) + "\n")
+                                left_i = left_i + 1
+                            elif (topic == '/right_camera/image_color'):
+                                img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                                cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                                right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)) + " " + str(current_speed) + "\n")
+                                right_i = right_i + 1
+                            elif (topic == '/center_camera/image_color/compressed'):
+                                img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                                cv2.imwrite(center_camera_path + str(center_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                                center_file.write(str(center_i) + " " + str(current_steering) + " " + str(current_speed) + "\n")
+                                center_i = center_i + 1
+                            elif (topic == '/left_camera/image_color/compressed'):
+                                img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                                cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                                left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)) + " " + str(current_speed) + "\n")
+                                left_i = left_i + 1
+                            elif (topic == '/right_camera/image_color/compressed'):
+                                img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+                                cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+                                right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)) + " " + str(current_speed) + "\n")
+                                right_i = right_i + 1
+            
         bag.close()
         
     center_file.close()
@@ -151,8 +150,12 @@ def calculate_angle_from_shift(shift, speed, steer_ratio = 14.8, wheel_base = 2.
         phi_o = np.pi/2.0
         return (speed*dt/wheel_base)*np.sin(x) + x + phi_o - np.arccos(shift / (speed*dt))
 
-    wheel_angle = scipy.optimize.broyden1(F, [0.1], f_tol=1e-5)
-    return steer_ratio*wheel_angle  #rad
+    #wheel_angle = scipy.optimize.broyden1(F, [0.1], f_tol=1e-5)
+    #return -steer_ratio*wheel_angle[0]  #rad Note: udacity's steering angle is inversed (+ to the left, - to the right)
+    if(shift < 0):
+        return -0.12
+    else:
+        return 0.12
     
 ################################################################################
 # Visualizes the results (based on comma.ai @marks)
