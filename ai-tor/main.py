@@ -23,15 +23,15 @@ stopping_callback = EarlyStopping(patience=5)
 train_paths = ["/home/aitor/udacity/center_camera/list_shuffled.txt", "/home/aitor/udacity/left_camera/list_shuffled.txt", "/home/aitor/udacity/right_camera/list_shuffled.txt"]
 val_paths = ["/home/aitor/udacity/center_camera/list_shuffled_val.txt", "/home/aitor/udacity/left_camera/list_shuffled_val.txt", "/home/aitor/udacity/right_camera/list_shuffled_val.txt"]
 
-train_generator = utils.udacity_data_generator(241, train_paths)
-val_data = utils.udacity_data_generator(1024, val_paths)
+train_generator = utils.udacity_data_generator(388, train_paths)
+val_data = utils.udacity_data_generator(278, val_paths)
 
 model.fit_generator(
     train_generator,
-    samples_per_epoch=36391,
-    nb_epoch=50,
+    samples_per_epoch=95836,
+    nb_epoch=100,
     validation_data=val_data,
-    nb_val_samples=1024
+    nb_val_samples=23909
     #callbacks=[stopping_callback]
 )
 #-----------------------------
@@ -43,5 +43,5 @@ if response:
 #-----------------------------
 
 #Show results-----------------
-utils.run_test_viewer(model)
+#utils.run_test_viewer(model)
 #----------------------------
