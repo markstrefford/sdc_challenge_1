@@ -67,13 +67,14 @@ def udacity_data_generator(batchsize, image_list, image_idx):
             # Get data for training here... it's in the dataframe
             imagepath = os.path.join(image_list[idx:idx+1]['imagepath'][1], image_list[idx:idx+1]['filename'][1])
             steering = image_list[idx:idx+1]['angle'][1]
-            x[i,:,:,:] = cv2.imread(imagepath)
+            img = cv2.imread(imagepath)
+            print "Processing image {} at index {}... {}, {}".format(i, idx, img.shape, steering)
+            x[i,:,:,:] = img
             y[i] = float(steering)
             i = i + 1
 
             if(i == batchsize):
                 i = 0
-                print x[0], y[0]
                 yield(x,y)
 
                 #except StopIteration:

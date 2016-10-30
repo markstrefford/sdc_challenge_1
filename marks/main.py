@@ -45,22 +45,24 @@ train_image_idx, valid_image_idx = utils.split_train_and_validate(images_df, 0.9
 train_generator = utils.udacity_data_generator(128, images_df, train_image_idx)
 val_data = utils.udacity_data_generator(1024, images_df, valid_image_idx)
 
-model.fit_generator(
+history = model.fit_generator(
     train_generator,
-    samples_per_epoch=20000,
-    nb_epoch=50,
+    samples_per_epoch=200,  #20000
+    nb_epoch=1,             #50,
     validation_data=val_data,
-    nb_val_samples=1024
+    nb_val_samples=10       #1024
     #callbacks=[stopping_callback]
 )
+
+
 #-----------------------------
 
 #Save it if it is ok-----------
-response = utils.query_yes_no("Training session has finished. Do you want to save the model?")
-if response:
-	model.save("/data/models/model.h5")
+#response = utils.query_yes_no("Training session has finished. Do you want to save the model?")
+#if response:
+model.save("/data/models/model.h5")
 #-----------------------------
 
 #Show results-----------------
-utils.run_test_viewer(model)
+#utils.run_test_viewer(model)
 #----------------------------
