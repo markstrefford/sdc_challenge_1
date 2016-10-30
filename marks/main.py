@@ -6,28 +6,49 @@ Created on Thu Oct  6 18:56:59 2016
 @author: aitor
 """
 
+import os
 import nnmodel
 import utils
-import rosbag
-import cv2
-import numpy as np
-from cv_bridge import CvBridge
-from keras.optimizers import SGD
-from keras.callbacks import EarlyStopping          
+from keras.optimizers import Adam
+from keras.callbacks import EarlyStopping
+from keras.utils.visualize_util import plot
+
 
 # Train model--------------------
 model = nnmodel.getNNModel()
-optimizer = SGD(lr=0.0001, decay=1e-6, momentum=0.9, nesterov=True)
+optimizer = Adam(lr=1e-4)
 model.compile(optimizer, loss="mse")
-stopping_callback = EarlyStopping(patience=50)
+plot(model, to_file='model.png')
+stopping_callback = EarlyStopping(patience=5)
 
-train_generator = utils.udacity_data_generator(128, shift=0.2)
-val_data = utils.validation_udacity_data(1024)
+train_data_path = '/data/Challenge 2/train'
+test_data_path = '/data/Challenge 2/test'
+
+# TODO:
+# Find subdirectories
+# Create a train and validation list at the top-level subdirectory level
+# Modify fit_generator to step through the list of images for train
+# Modify validation code??
+
+print "Preparing training and validation data..."
+train_paths = utils.get_data_paths(train_data_path)
+#print train_paths
+images_df = utils.get_image_list(train_paths)
+num_images = images_df.shape[0]
+print "Found {} training images.".format(num_images)
+
+train_image_idx, valid_image_idx = utils.split_train_and_validate(images_df, 0.90)  # Start with a 90/10 split of train/validation
+
+#train_paths = ["../data/center_camera/shuffled_list.txt", "../data/lft_camera/shuffled_list.txt", "../data/right_camera/shuffled_list.txt"]
+#val_paths = ["/home/aitor/udacity/center_camera/list_shuffled_val.txt", "/home/aitor/udacity/left_camera/list_shuffled_val.txt", "/home/aitor/udacity/right_camera/list_shuffled_val.txt"]
+
+train_generator = utils.udacity_data_generator(128, images_df, train_image_idx)
+val_data = utils.udacity_data_generator(1024, images_df, valid_image_idx)
 
 model.fit_generator(
     train_generator,
-    samples_per_epoch=128,
-    nb_epoch=864,
+    samples_per_epoch=20000,
+    nb_epoch=50,
     validation_data=val_data,
     nb_val_samples=1024
     #callbacks=[stopping_callback]
@@ -37,17 +58,9 @@ model.fit_generator(
 #Save it if it is ok-----------
 response = utils.query_yes_no("Training session has finished. Do you want to save the model?")
 if response:
-    model.save("/media/aitor/Data/udacity/model.h5")
+	model.save("/data/models/model.h5")
 #-----------------------------
 
 #Show results-----------------
-real_steering = 0
-x = np.zeros((1, 66, 200, 3))
-for topic, msg, t in rosbag.Bag("/media/aitor/Data/udacity/dataset1-clean.bag").read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color']):
-	if(topic == '/vehicle/steering_report'):
-         real_steering = msg.steering_wheel_angle
-	elif(topic == '/center_camera/image_color'):
-         x[0,:,:,:] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66)).astype("float")
-         y = model.predict(x, batch_size=1)
-         print "real: " + str(real_steering) + ", predicted: " + str(y)
+utils.run_test_viewer(model)
 #----------------------------
