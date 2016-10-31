@@ -54,6 +54,9 @@ def udacity_data_generator(batchsize, image_list, image_idx):
         y = np.zeros(batchsize)
         iterators = []
 
+	print "imagelist {} / {}".format(image_list[1:50], len(image_list))
+	print "imageidx {} / {}".format(image_idx[1:50], len(image_idx))
+
         #for path in paths:
         #    iterators.append(open(path))
 
@@ -65,8 +68,11 @@ def udacity_data_generator(batchsize, image_list, image_idx):
             #line = it.next()
             #imagepath = os.path.dirname(it.name) + "/" + line.split()[0] + ".jpg"
             # Get data for training here... it's in the dataframe
-            imagepath = os.path.join(image_list[idx:idx+1]['imagepath'][1], image_list[idx:idx+1]['filename'][1])
-            steering = image_list[idx:idx+1]['angle'][1]
+	    print "idx {}".format(idx)
+            print "imagepath {}".format(image_list.at[idx, 'imagepath'])
+            print "filename {}".format(image_list.at[idx, 'filename'])
+            imagepath = os.path.join(image_list.at[idx,'imagepath'], image_list.at[idx, 'filename'])
+            steering = image_list.at[idx, 'angle']
             img = cv2.imread(imagepath)
             print "Processing image {} at index {}... {}, {}".format(i, idx, img.shape, steering)
             x[i,:,:,:] = img
