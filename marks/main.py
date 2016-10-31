@@ -38,21 +38,21 @@ num_images = images_df.shape[0]
 print "Found {} training images.".format(num_images)
 
 train_image_idx, valid_image_idx = utils.split_train_and_validate(images_df, 0.90)  # Start with a 90/10 split of train/validation
-print train_image_idx[:10]
-print valid_image_idx[:10]
+#print train_image_idx[:10]
+#print valid_image_idx[:10]
 
 #train_paths = ["../data/center_camera/shuffled_list.txt", "../data/lft_camera/shuffled_list.txt", "../data/right_camera/shuffled_list.txt"]
 #val_paths = ["/home/aitor/udacity/center_camera/list_shuffled_val.txt", "/home/aitor/udacity/left_camera/list_shuffled_val.txt", "/home/aitor/udacity/right_camera/list_shuffled_val.txt"]
 
-train_generator = utils.udacity_data_generator(128, images_df, train_image_idx, 't')
-val_data = utils.udacity_data_generator(32, images_df, valid_image_idx, 'v')
+train_generator = utils.udacity_data_generator(256, images_df, train_image_idx, 't')
+val_data = utils.udacity_data_generator(256, images_df, valid_image_idx, 'v')
 
 history = model.fit_generator(
     train_generator,
-    samples_per_epoch=100,  #20000
-    nb_epoch=1,             #50,
+    samples_per_epoch=20000,
+    nb_epoch=2,      #200
     validation_data=val_data,
-    nb_val_samples=10       #1024
+    nb_val_samples=1024
     #callbacks=[stopping_callback]
 )
 

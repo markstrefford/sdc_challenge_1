@@ -47,7 +47,7 @@ def split_train_and_validate(image_list, split = 1.0):
     return image_train_list, image_valid_list
 
 ################################################################################
-# Generator for Keras over jpeg dataset (@ai-tor/#marks)
+# Generator for Keras over jpeg dataset (@ai-tor/@marks)
 ################################################################################
 def udacity_data_generator(batchsize, image_list, image_idx, flag):
     #while 1:
@@ -67,11 +67,11 @@ def udacity_data_generator(batchsize, image_list, image_idx, flag):
         #line = it.next()
         #imagepath = os.path.dirname(it.name) + "/" + line.split()[0] + ".jpg"
         # Get data for training here... it's in the dataframe
-        print "{}{} / idx {}".format(flag, i, idx)
+        #print "{}{} / idx {}".format(flag, i, idx)
         #print "imagepath {}".format(image_list.at[idx, 'imagepath'])
         #print "filename {}".format(image_list.at[idx, 'filename'])
-        imagepath = os.path.join(image_list.at[idx,'imagepath'], image_list.at[idx, 'filename'])
         steering = image_list.at[idx, 'angle']
+        imagepath = os.path.join(image_list.at[idx,'imagepath'], image_list.at[idx, 'filename'])
         img = cv2.resize(cv2.imread(imagepath), (200, 66))
         #print "Processing image {} at index {}... {}, {}".format(i, idx, img.shape, steering)
         x[i,:,:,:] = img
@@ -80,8 +80,8 @@ def udacity_data_generator(batchsize, image_list, image_idx, flag):
 
         if(i == batchsize):
             i = 0
-            print "x: {} / y: {}".format(x, y)
-        yield (x,y)
+            #print "x: {} / y: {}".format(x, y)
+            yield (x,y)
 
         #except StopIteration:
         #    it.close()
