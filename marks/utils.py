@@ -72,7 +72,11 @@ def udacity_data_generator(batchsize, image_list, image_idx, flag):
         #print "filename {}".format(image_list.at[idx, 'filename'])
         steering = image_list.at[idx, 'angle']
         imagepath = os.path.join(image_list.at[idx,'imagepath'], image_list.at[idx, 'filename'])
-        img = cv2.resize(cv2.imread(imagepath), (200, 66))
+        image = cv2.imread(imagepath)
+        try:
+            img = cv2.resize(img, (200, 66))
+        except:
+            img = np.zeros((66, 200, 3))
         #print "Processing image {} at index {}... {}, {}".format(i, idx, img.shape, steering)
         x[i,:,:,:] = img
         y[i] = float(steering)
