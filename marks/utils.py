@@ -52,10 +52,7 @@ def udacity_data_generator(batchsize, image_list, image_idx):
     #while 1:
     x = np.zeros((batchsize, 66, 200, 3))
     y = np.zeros(batchsize)
-    iterators = []
-
-    print "imagelist {} / {}".format(image_list[1:50], len(image_list))
-    print "imageidx {} / {}".format(image_idx[1:50], len(image_idx))
+    #iterators = []
 
     #for path in paths:
     #    iterators.append(open(path))
@@ -74,7 +71,8 @@ def udacity_data_generator(batchsize, image_list, image_idx):
             #print "filename {}".format(image_list.at[idx, 'filename'])
             imagepath = os.path.join(image_list.at[idx,'imagepath'], image_list.at[idx, 'filename'])
             steering = image_list.at[idx, 'angle']
-            img = cv2.resize(cv_bridge.imgmsg_to_cv2(imagepath, "bgr8"), (200, 66))
+            #img = cv2.resize(CvBridge.imgmsg_to_cv2(cv2.imread(imagepath), "bgr8"), (200, 66))
+            img = cv2.resize(cv2.imread(imagepath), (200, 66))
             #img = cv2.imread(imagepath)
             #print "Processing image {} at index {}... {}, {}".format(i, idx, img.shape, steering)
             x[i,:,:,:] = img
@@ -83,6 +81,7 @@ def udacity_data_generator(batchsize, image_list, image_idx):
 
             if(i == batchsize):
                 i = 0
+		print "x: {} / y: {}".format(x, y)
                 yield (x,y)
 
         #except StopIteration:
