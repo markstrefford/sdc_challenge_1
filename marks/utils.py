@@ -49,7 +49,7 @@ def split_train_and_validate(image_list, split = 1.0):
 # Generator for Keras over jpeg dataset (@ai-tor/#marks)
 ################################################################################
 def udacity_data_generator(batchsize, image_list, image_idx):
-    while 1:
+    #while 1:
         x = np.zeros((batchsize, 66, 200, 3))
         y = np.zeros(batchsize)
         iterators = []
@@ -75,7 +75,7 @@ def udacity_data_generator(batchsize, image_list, image_idx):
 
             if(i == batchsize):
                 i = 0
-                yield(x,y)
+                return (x,y)
 
                 #except StopIteration:
                 #    it.close()
