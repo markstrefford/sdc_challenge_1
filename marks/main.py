@@ -44,13 +44,13 @@ train_image_idx, valid_image_idx = utils.split_train_and_validate(images_df, 0.9
 #train_paths = ["../data/center_camera/shuffled_list.txt", "../data/lft_camera/shuffled_list.txt", "../data/right_camera/shuffled_list.txt"]
 #val_paths = ["/home/aitor/udacity/center_camera/list_shuffled_val.txt", "/home/aitor/udacity/left_camera/list_shuffled_val.txt", "/home/aitor/udacity/right_camera/list_shuffled_val.txt"]
 
-train_generator = utils.udacity_data_generator(256, images_df, train_image_idx, 't')
-val_data = utils.udacity_data_generator(256, images_df, valid_image_idx, 'v')
+train_generator = utils.udacity_data_generator(2048, images_df, train_image_idx, 't')
+val_data = utils.udacity_data_generator(1024, images_df, valid_image_idx, 'v')
 
 history = model.fit_generator(
     train_generator,
-    samples_per_epoch=20000,
-    nb_epoch=2,      #200
+    samples_per_epoch=20480,
+    nb_epoch=150,
     validation_data=val_data,
     nb_val_samples=1024
     #callbacks=[stopping_callback]
