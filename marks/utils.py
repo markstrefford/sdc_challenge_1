@@ -48,7 +48,7 @@ def split_train_and_validate(image_list, split = 1.0):
 ################################################################################
 # Generator for Keras over jpeg dataset (@ai-tor/#marks)
 ################################################################################
-def udacity_data_generator(batchsize, image_list, image_idx):
+def udacity_data_generator(batchsize, image_list, image_idx, flag):
     #while 1:
     x = np.zeros((batchsize, 66, 200, 3))
     y = np.zeros(batchsize)
@@ -66,7 +66,7 @@ def udacity_data_generator(batchsize, image_list, image_idx):
         #line = it.next()
         #imagepath = os.path.dirname(it.name) + "/" + line.split()[0] + ".jpg"
         # Get data for training here... it's in the dataframe
-        print "idx {}".format(idx)
+        print "{}{} / idx {}".format(flag, i, idx)
         #print "imagepath {}".format(image_list.at[idx, 'imagepath'])
         #print "filename {}".format(image_list.at[idx, 'filename'])
         imagepath = os.path.join(image_list.at[idx,'imagepath'], image_list.at[idx, 'filename'])
