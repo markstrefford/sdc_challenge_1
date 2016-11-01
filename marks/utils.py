@@ -49,7 +49,7 @@ def split_train_and_validate(image_list, split = 1.0):
 ################################################################################
 # Generator for Keras over jpeg dataset (@ai-tor/@marks)
 ################################################################################
-def udacity_data_generator(batchsize, image_list, image_idx, flag):
+def udacity_data_generator(batchsize, image_list, image_idx, flag, min_speed = 4, min_angle = 0.1, straight_road_prob = 0.2):
     # while 1:
     x = np.zeros((batchsize, 66, 200, 3))
     y = np.zeros(batchsize)
@@ -71,6 +71,7 @@ def udacity_data_generator(batchsize, image_list, image_idx, flag):
             # print "imagepath {}".format(image_list.at[idx, 'imagepath'])
             # print "filename {}".format(image_list.at[idx, 'filename'])
             steering = image_list.at[idx, 'angle']
+            speed = image.list.at[idx, 'speed']
             imagepath = os.path.join(image_list.at[idx, 'imagepath'], image_list.at[idx, 'filename'])
             image = cv2.imread(imagepath)
             try:
@@ -78,9 +79,11 @@ def udacity_data_generator(batchsize, image_list, image_idx, flag):
             except:
                 img = np.zeros((66, 200, 3))
             # print "Processing image {} at index {}... {}, {}".format(i, idx, img.shape, steering)
-            x[i, :, :, :] = img
-            y[i] = float(steering)
-            i = i + 1
+            r = np.random.uniform(0, 1)
+            if ((abs(steering) > min_angle) and speed >= min_speed) or (r < straight_road_prob):
+                x[i, :, :, :] = img
+                y[i] = float(steering)
+                i = i + 1
 
             if (i == batchsize):
                 i = 0
