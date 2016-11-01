@@ -52,7 +52,7 @@ val_data = utils.udacity_data_generator(1024, images_df, valid_image_idx, 'v')
 history = model.fit_generator(
     train_generator,
     samples_per_epoch=num_training_samples,
-    nb_epoch=50,
+    nb_epoch=25,
     validation_data=val_data,
     nb_val_samples=num_valid_samples
     #callbacks=[stopping_callback]
