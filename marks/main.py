@@ -38,6 +38,8 @@ num_images = images_df.shape[0]
 print "Found {} training images.".format(num_images)
 
 train_image_idx, valid_image_idx = utils.split_train_and_validate(images_df, 0.90)  # Start with a 90/10 split of train/validation
+num_training_samples = len(train_image_idx)
+num_valid_samples = len(valid_image_idx)
 #print train_image_idx[:10]
 #print valid_image_idx[:10]
 
@@ -49,10 +51,10 @@ val_data = utils.udacity_data_generator(1024, images_df, valid_image_idx, 'v')
 
 history = model.fit_generator(
     train_generator,
-    samples_per_epoch=20480,
-    nb_epoch=150,
+    samples_per_epoch=num_training_samples,
+    nb_epoch=50,
     validation_data=val_data,
-    nb_val_samples=1024
+    nb_val_samples=num_valid_samples
     #callbacks=[stopping_callback]
 )
 
