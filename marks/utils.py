@@ -71,7 +71,7 @@ def udacity_data_generator(batchsize, image_list, image_idx, flag, min_speed = 4
             # print "imagepath {}".format(image_list.at[idx, 'imagepath'])
             # print "filename {}".format(image_list.at[idx, 'filename'])
             steering = image_list.at[idx, 'angle']
-            speed = image.list.at[idx, 'speed']
+            speed = image_list.at[idx, 'speed']
             imagepath = os.path.join(image_list.at[idx, 'imagepath'], image_list.at[idx, 'filename'])
             image = cv2.imread(imagepath)
             try:
