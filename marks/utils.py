@@ -1,9 +1,9 @@
 import os
 import random
-import rosbag
+#import rosbag
+#from cv_bridge import CvBridge
 import cv2
 import numpy as np
-from cv_bridge import CvBridge
 import sys
 import scipy
 from skimage import transform as tf
@@ -116,113 +116,113 @@ def shuffle_list(listpath, outpath):
 ################################################################################
 # Saves the rosbag files into jpeg (@ai-tor)
 ################################################################################
-def rosbag_to_jpeg(bagslist, outpath):
-    cvbridge = CvBridge()
-
-    left_camera_path = outpath + "left_camera/"
-    right_camera_path = outpath + "right_camera/"
-    center_camera_path = outpath + "center_camera/"
-
-    if not os.path.exists(outpath):
-        os.makedirs(outpath)
-
-    if not os.path.exists(left_camera_path):
-        os.makedirs(left_camera_path)
-
-    if not os.path.exists(right_camera_path):
-        os.makedirs(right_camera_path)
-
-    if not os.path.exists(center_camera_path):
-        os.makedirs(center_camera_path)
-
-    center_file = open(center_camera_path + "list.txt", 'w')
-    right_file = open(right_camera_path + "list.txt", 'w')
-    left_file = open(left_camera_path + "list.txt", 'w')
-
-    center_i = 0
-    left_i = 0
-    right_i = 0
-    for bagpath in bagslist:
-        bag = rosbag.Bag(bagpath)
-
-        current_steering = -1
-        current_speed = 0
-        for topic, msg, t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color', '/left_camera/image_color', '/right_camera/image_color', '/center_camera/image_color/compressed', '/left_camera/image_color/compressed', '/right_camera/image_color/compressed']):
-                if (topic == '/vehicle/steering_report'):
-                    current_steering = msg.steering_wheel_angle
-                    current_speed = msg.speed
-
-                if (current_steering != -1):
-                     if (topic == '/center_camera/image_color'):
-                        img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                        cv2.imwrite(center_camera_path + str(center_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        center_file.write(str(center_i) + " " + str(current_steering) + " " + str(current_speed) + "\n")
-                        center_i = center_i + 1
-                     elif (topic == '/left_camera/image_color'):
-                        img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                        cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)[0]) + " " + str(current_speed) + "\n")
-                        left_i = left_i + 1
-                     elif (topic == '/right_camera/image_color'):
-                        img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                        cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)[0]) + " " + str(current_speed) + "\n")
-                        right_i = right_i + 1
-                     elif (topic == '/center_camera/image_color/compressed'):
-                        img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                        cv2.imwrite(center_camera_path + str(center_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        center_file.write(str(center_i) + " " + str(current_steering) + " " + str(current_speed) + "\n")
-                        center_i = center_i + 1
-                     elif (topic == '/left_camera/image_color/compressed'):
-                        img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                        cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)[0]) + " " + str(current_speed) + "\n")
-                        left_i = left_i + 1
-                     elif (topic == '/right_camera/image_color/compressed'):
-                        img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-                        cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
-                        right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)[0]) + " " + str(current_speed) + "\n")
-                        right_i = right_i + 1
-
-        bag.close()
-
-    center_file.close()
-    right_file.close()
-    left_file.close()
+# def rosbag_to_jpeg(bagslist, outpath):
+#     cvbridge = CvBridge()
+#
+#     left_camera_path = outpath + "left_camera/"
+#     right_camera_path = outpath + "right_camera/"
+#     center_camera_path = outpath + "center_camera/"
+#
+#     if not os.path.exists(outpath):
+#         os.makedirs(outpath)
+#
+#     if not os.path.exists(left_camera_path):
+#         os.makedirs(left_camera_path)
+#
+#     if not os.path.exists(right_camera_path):
+#         os.makedirs(right_camera_path)
+#
+#     if not os.path.exists(center_camera_path):
+#         os.makedirs(center_camera_path)
+#
+#     center_file = open(center_camera_path + "list.txt", 'w')
+#     right_file = open(right_camera_path + "list.txt", 'w')
+#     left_file = open(left_camera_path + "list.txt", 'w')
+#
+#     center_i = 0
+#     left_i = 0
+#     right_i = 0
+#     for bagpath in bagslist:
+#         bag = rosbag.Bag(bagpath)
+#
+#         current_steering = -1
+#         current_speed = 0
+#         for topic, msg, t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color', '/left_camera/image_color', '/right_camera/image_color', '/center_camera/image_color/compressed', '/left_camera/image_color/compressed', '/right_camera/image_color/compressed']):
+#                 if (topic == '/vehicle/steering_report'):
+#                     current_steering = msg.steering_wheel_angle
+#                     current_speed = msg.speed
+#
+#                 if (current_steering != -1):
+#                      if (topic == '/center_camera/image_color'):
+#                         img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+#                         cv2.imwrite(center_camera_path + str(center_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+#                         center_file.write(str(center_i) + " " + str(current_steering) + " " + str(current_speed) + "\n")
+#                         center_i = center_i + 1
+#                      elif (topic == '/left_camera/image_color'):
+#                         img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+#                         cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+#                         left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)[0]) + " " + str(current_speed) + "\n")
+#                         left_i = left_i + 1
+#                      elif (topic == '/right_camera/image_color'):
+#                         img = cv2.resize(cvbridge.imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+#                         cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+#                         right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)[0]) + " " + str(current_speed) + "\n")
+#                         right_i = right_i + 1
+#                      elif (topic == '/center_camera/image_color/compressed'):
+#                         img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+#                         cv2.imwrite(center_camera_path + str(center_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+#                         center_file.write(str(center_i) + " " + str(current_steering) + " " + str(current_speed) + "\n")
+#                         center_i = center_i + 1
+#                      elif (topic == '/left_camera/image_color/compressed'):
+#                         img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+#                         cv2.imwrite(left_camera_path + str(left_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+#                         left_file.write(str(left_i) + " " + str(current_steering + calculate_angle_from_shift(0.5, current_speed)[0]) + " " + str(current_speed) + "\n")
+#                         left_i = left_i + 1
+#                      elif (topic == '/right_camera/image_color/compressed'):
+#                         img = cv2.resize(cvbridge.compressed_imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+#                         cv2.imwrite(right_camera_path + str(right_i) + ".jpg", img, [int(cv2.IMWRITE_JPEG_QUALITY), 100])
+#                         right_file.write(str(right_i) + " " + str(current_steering + calculate_angle_from_shift(-0.5, current_speed)[0]) + " " + str(current_speed) + "\n")
+#                         right_i = right_i + 1
+#
+#         bag.close()
+#
+#     center_file.close()
+#     right_file.close()
+#     left_file.close()
 
 
 ################################################################################
 # Cleaning the Data (removes stopped frames and most of straight lines @ai-tor, @deretiel)
 ################################################################################
-def clean_dataset(inpath, outpath):
-    # Clean the rosbag
-    print "start"
-    with rosbag.Bag(outpath, 'w') as outbag:
-        bag = rosbag.Bag(inpath)
-
-        current_speed = 0
-        j = 0
-        r = np.random.uniform(0,1)
-        print "opened file"
-        for topic, msg, t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color',  '/left_camera/image_color', '/right_camera/image_color', '/center_camera/image_color/compressed',  '/left_camera/image_color/compressed', '/right_camera/image_color/compressed']):
-
-            if (topic == '/vehicle/steering_report'):
-                current_speed = msg.speed
-                current_steering_msg = msg
-                current_steering = msg.steering_wheel_angle
-                current_time = t
-                current_topic = topic
-
-            elif (current_speed > 8.0): #an image
-                if ((abs(current_steering) >= 0.1) or (r < 0.2)):
-                    outbag.write(topic, msg, t)
-                    j = j + 1
-
-                    if (j == 3): #one steering angle for every 3 images (left, right and center camera)
-                        outbag.write(current_topic, current_steering_msg, current_time)
-                        r = np.random.uniform(0,1)
-                        current_speed = 0
-                        j = 0
+# def clean_dataset(inpath, outpath):
+#     # Clean the rosbag
+#     print "start"
+#     with rosbag.Bag(outpath, 'w') as outbag:
+#         bag = rosbag.Bag(inpath)
+#
+#         current_speed = 0
+#         j = 0
+#         r = np.random.uniform(0,1)
+#         print "opened file"
+#         for topic, msg, t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color',  '/left_camera/image_color', '/right_camera/image_color', '/center_camera/image_color/compressed',  '/left_camera/image_color/compressed', '/right_camera/image_color/compressed']):
+#
+#             if (topic == '/vehicle/steering_report'):
+#                 current_speed = msg.speed
+#                 current_steering_msg = msg
+#                 current_steering = msg.steering_wheel_angle
+#                 current_time = t
+#                 current_topic = topic
+#
+#             elif (current_speed > 8.0): #an image
+#                 if ((abs(current_steering) >= 0.1) or (r < 0.2)):
+#                     outbag.write(topic, msg, t)
+#                     j = j + 1
+#
+#                     if (j == 3): #one steering angle for every 3 images (left, right and center camera)
+#                         outbag.write(current_topic, current_steering_msg, current_time)
+#                         r = np.random.uniform(0,1)
+#                         current_speed = 0
+#                         j = 0
 
 ################################################################################
 # Calculates angle for shifted cameras (@mohamed_ibrahim)
@@ -311,30 +311,30 @@ def run_test_viewer(model, bagpath = "/media/aitor/Data/udacity/dataset1.bag"):
     y = np.zeros(1)
     current_steering = -1
     current_speed = 0
-    cvbridge = CvBridge()
-    bag = rosbag.Bag(bagpath)
-    for topic, msg, t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color']):
-        if (topic == '/vehicle/steering_report'):
-            current_steering = msg.steering_wheel_angle
-            current_speed = msg.speed
-
-        if (current_steering != -1):
-            if (topic == '/center_camera/image_color'):
-                img = cvbridge.imgmsg_to_cv2(msg, "bgr8")
-                img_viewer = cv2.resize(img, (320, 240))
-                x[0,:,:,:] = cv2.resize(img, (200, 66))
-                y = model.predict(x, batch_size=1)
-
-                draw_path_on(img_viewer, current_speed, current_steering)
-                draw_path_on(img_viewer, current_speed, y[0])
-
-                cv2.imshow('Udacity challenge 2 - viewer', img)
-                key = cv2.waitKey(30)
-
-                if key == ord('q'):
-                    break
-
-                print "Steering angle: {} / Predicted: {}".format(current_steering, y[0])
+    # cvbridge = CvBridge()
+    # bag = rosbag.Bag(bagpath)
+    # for topic, msg, t in bag.read_messages(topics=['/vehicle/steering_report', '/center_camera/image_color']):
+    #     if (topic == '/vehicle/steering_report'):
+    #         current_steering = msg.steering_wheel_angle
+    #         current_speed = msg.speed
+    #
+    #     if (current_steering != -1):
+    #         if (topic == '/center_camera/image_color'):
+    #             img = cvbridge.imgmsg_to_cv2(msg, "bgr8")
+    #             img_viewer = cv2.resize(img, (320, 240))
+    #             x[0,:,:,:] = cv2.resize(img, (200, 66))
+    #             y = model.predict(x, batch_size=1)
+    #
+    #             draw_path_on(img_viewer, current_speed, current_steering)
+    #             draw_path_on(img_viewer, current_speed, y[0])
+    #
+    #             cv2.imshow('Udacity challenge 2 - viewer', img)
+    #             key = cv2.waitKey(30)
+    #
+    #             if key == ord('q'):
+    #                 break
+    #
+    #             print "Steering angle: {} / Predicted: {}".format(current_steering, y[0])
 
     cv2.destroyAllWindows()
 
