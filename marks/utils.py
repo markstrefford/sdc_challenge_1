@@ -9,6 +9,9 @@ import scipy
 from skimage import transform as tf
 import pandas as pd
 
+ch, width, height = 3, 200, 66
+
+
 ################################################################################
 # Get a list of directories for training or testing purposes
 # Assumes that the structure is /data/subdir1, /data/subdir2, etc...  (@marks)
@@ -17,8 +20,9 @@ def get_data_paths(data_path):
     paths = []
     subdirs = os.listdir(data_path)
     for dir in subdirs:
-        path = os.path.join(data_path, dir)
-        paths.append(path)
+        if dir != '.DS_Store':    #Skip if the Mac OSX .DS_Store file getting in the way!
+            path = os.path.join(data_path, dir)
+            paths.append(path)
     return paths
 
 ################################################################################
@@ -51,7 +55,7 @@ def split_train_and_validate(image_list, split = 1.0):
 ################################################################################
 def udacity_data_generator(batchsize, image_list, image_idx, flag, min_speed = 4, min_angle = 0.1, straight_road_prob = 0.2):
     # while 1:
-    x = np.zeros((batchsize, 66, 200, 3))
+    x = np.zeros((batchsize, ch, width, height))  # Aligns with the way OpenCV works (height, width, ch)
     y = np.zeros(batchsize)
     # iterators = []
 
@@ -74,16 +78,19 @@ def udacity_data_generator(batchsize, image_list, image_idx, flag, min_speed = 4
             speed = image_list.at[idx, 'speed']
             imagepath = os.path.join(image_list.at[idx, 'imagepath'], image_list.at[idx, 'filename'])
             image = cv2.imread(imagepath)
-            try:
-                img = cv2.resize(img, (200, 66))
-            except:
-                img = np.zeros((66, 200, 3))
+            #try:
+            img = cv2.resize(image, (200, 66))
             # print "Processing image {} at index {}... {}, {}".format(i, idx, img.shape, steering)
             r = np.random.uniform(0, 1)
             if ((abs(steering) > min_angle) and speed >= min_speed) or (r < straight_road_prob):
-                x[i, :, :, :] = img
+                x[i, :, :, :] = img.transpose(2,1,0)   # Transpose the image to fit into the CNN later...
                 y[i] = float(steering)
                 i = i + 1
+
+            #except:
+                # If resizing fails, skip...
+                #print "udacity_data_generator():WARN - Image {}, shape {} failed to resize".format(imagepath, image.shape)
+                #print "udacity_data_generator():WARN - Unexpected error resizing image: {}".format(sys.exc_info())
 
             if (i == batchsize):
                 i = 0

@@ -22,7 +22,7 @@ def getNNModel(model_path=None, reg_lambda=0.0):
         ch, width, height = 3, 200, 66
 
         model = Sequential()
-        model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=(ch, height, width), output_shape=(ch, height, width)))
+        model.add(Lambda(lambda x: x / 127.5 - 1., input_shape=(ch, width, height), output_shape=(ch, width, height)))
 
         model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='same', init='he_normal', name='conv1'))
         model.add(ELU())
