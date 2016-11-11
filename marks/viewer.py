@@ -142,15 +142,14 @@ i=0
 print "Preparing image data for viewer..."
 train_paths = u.get_data_paths(train_data_path)
 #print train_paths
-images_df = u.get_image_list(train_paths)
+img_df = u.get_image_list(train_paths)
+images_df = img_df.loc[img_df['frame_id']=='center_camera'].reset_index(drop=True) # , inplace=True)   # Get centre camera images only
 num_images = images_df.shape[0]
 print "Found {} images.".format(num_images)
 
 #for img, steering, speed in u.udacity_data_generator(1, images_df, range(len(images_df))):   # (128, images_df, train_image_idx, 't')
-for img, steering, speed in u.udacity_data_generator(1, images_df, range(len(images_df)), get_speed = True, img_transpose=False,
-                                                     min_speed = 0, min_angle = 0):   # (128, images_df, train_image_idx, 't')
-
-    print img[0].shape
+for img, steering, speed in u.data_generator(1, images_df, range(len(images_df)), get_speed = True, img_transpose=False,
+                                                     resize = False, min_speed = 0, min_angle = 0):   # (128, images_df, train_image_idx, 't')
 
     predicted_steering = predict_steering_angle(i, img, speed)
     draw_path_on(img[0], speed, steering)

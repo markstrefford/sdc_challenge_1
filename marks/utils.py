@@ -56,12 +56,17 @@ def split_train_and_validate(image_list, split = 1.0):
 ################################################################################
 # Generator for Keras over jpeg dataset (@ai-tor/@marks)
 ################################################################################
-def udacity_data_generator(batchsize, image_list, image_idx, get_speed = True, img_transpose = True, min_speed = 4, min_angle = 0.1, straight_road_prob = 0.2):
+def data_generator(batchsize, image_list, image_idx, get_speed = True, img_transpose = True, resize = True,
+                           min_speed = 4, min_angle = 0.1, straight_road_prob = 0.2):
+    if resize == False:
+        width, height = 640, 480
+    # Else go with the values set in utils
+
     # while 1:
     if img_transpose == True:
-        x = np.zeros((batchsize, ch, width, height))
+        x = np.zeros((batchsize, ch, width, height), dtype=np.uint8)
     else:
-        x = np.zeros((batchsize, height, width, ch))
+        x = np.zeros((batchsize, height, width, ch), dtype=np.uint8)
     y = np.zeros(batchsize)
     z = np.zeros(batchsize)
     # iterators = []
@@ -81,13 +86,15 @@ def udacity_data_generator(batchsize, image_list, image_idx, get_speed = True, i
             # print "{}{} / idx {}".format(flag, i, idx)
             # print "imagepath {}".format(image_list.at[idx, 'imagepath'])
             # print "filename {}".format(image_list.at[idx, 'filename'])
+            print image_list.loc[idx]
             steering = image_list.at[idx, 'angle']
             speed = image_list.at[idx, 'speed']
             imagepath = os.path.join(image_list.at[idx, 'imagepath'], image_list.at[idx, 'filename'])
             image = cv2.imread(imagepath)
-            cv2.imshow("Viewer", image)
+            #cv2.imshow("Viewer", image)
             #try:
-            img = cv2.resize(image, (200, 66))
+            img = cv2.resize(image, (width, height))
+
             # print "Processing image {} at index {}... {}, {}".format(i, idx, img.shape, steering)
             r = np.random.uniform(0, 1)
             if ((abs(steering) > min_angle) and speed >= min_speed) or (r < straight_road_prob):
