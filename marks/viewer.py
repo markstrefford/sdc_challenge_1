@@ -83,7 +83,7 @@ rdst = \
   [41.67121717733509, -2.029755283648498]]
 
 tform3_img = tf.ProjectiveTransform()
-tform3_img.estimate(np.array(rdst), np.array(rsrc))   # *2 required due to viewer size (640x480)
+tform3_img.estimate(np.array(rdst)*2, np.array(rsrc)*2)   # *2 required due to viewer size (640x480)
 
 def perspective_tform(x, y):
   p1, p2 = tform3_img((x,y))[0]
