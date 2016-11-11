@@ -6,52 +6,53 @@ import numpy as np
 import pygame
 #import json
 #from keras.models import model_from_json
-import utils
-import rosbag
+import utils as u
 import cv2
-from cv_bridge import CvBridge
+
+train_data_path = u.train_data_path  #'../data/Challenge 2/train'
+ch, width, height = u.ch, u.width, u.height
 
 # Load images from the ROS databag, resize accordingly and ensure orientation (w x h instead of h x w)
-def load_rosbag_data(path, frame_size):
-    print 'Loading databag...'
-    while 1:
-        bag = rosbag.Bag(path)
-        nmessages = bag.get_message_count('/center_camera/image_color')
-        i = 0
-        steering_angle, current_wheel_speed, speed = 0, 0, 0
-
-        for topic, msg, t in bag.read_messages(
-            topics=['/vehicle/steering_report',
-                    '/center_camera/image_color',
-                    '/left_camera/image_color',
-                    '/right_camera/image_color']):
-
-            if (topic == '/vehicle/steering_report'):
-                current_steering = msg.steering_wheel_angle
-                current_speed = msg.speed
-            elif (topic == '/center_camera/image_color'):
-                img = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), frame_size,
-                                 interpolation = cv2.INTER_LINEAR) #.swapaxes(0, 1)  #x[i] = ...
-                steering_angle = current_steering
-                speed = current_speed
-                yield (img, steering_angle, speed)   # (x, y)
-                i += 1
-
-            # elif (topic == '/left_camera/image_color'):
-            #     x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-            #     y[i] = np.array([current_steering + shift]);
-            #     i = i + 1
-            # elif (topic == '/right_camera/image_color'):
-            #     x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
-            #     y[i] = np.array([current_steering - shift]);
-            #     i = i + 1
-
-            if i % 100 == 0:
-                print "Loaded image {}/{}".format(i, nmessages)
-            if (i == nmessages):
-                yield (img, steering_angle, speed)
-
-        bag.close()
+# def load_rosbag_data(path, frame_size):
+#     print 'Loading databag...'
+#     while 1:
+#         bag = rosbag.Bag(path)
+#         nmessages = bag.get_message_count('/center_camera/image_color')
+#         i = 0
+#         steering_angle, current_wheel_speed, speed = 0, 0, 0
+#
+#         for topic, msg, t in bag.read_messages(
+#             topics=['/vehicle/steering_report',
+#                     '/center_camera/image_color',
+#                     '/left_camera/image_color',
+#                     '/right_camera/image_color']):
+#
+#             if (topic == '/vehicle/steering_report'):
+#                 current_steering = msg.steering_wheel_angle
+#                 current_speed = msg.speed
+#             elif (topic == '/center_camera/image_color'):
+#                 img = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), frame_size,
+#                                  interpolation = cv2.INTER_LINEAR) #.swapaxes(0, 1)  #x[i] = ...
+#                 steering_angle = current_steering
+#                 speed = current_speed
+#                 yield (img, steering_angle, speed)   # (x, y)
+#                 i += 1
+#
+#             # elif (topic == '/left_camera/image_color'):
+#             #     x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+#             #     y[i] = np.array([current_steering + shift]);
+#             #     i = i + 1
+#             # elif (topic == '/right_camera/image_color'):
+#             #     x[i] = cv2.resize(CvBridge().imgmsg_to_cv2(msg, "bgr8"), (200, 66))
+#             #     y[i] = np.array([current_steering - shift]);
+#             #     i = i + 1
+#
+#             if i % 100 == 0:
+#                 print "Loaded image {}/{}".format(i, nmessages)
+#             if (i == nmessages):
+#                 yield (img, steering_angle, speed)
+#
+#         bag.close()
 
 
 # Based on code from comma.ai viewer
@@ -135,18 +136,29 @@ frame_size = (320,240)
 
 # Main Loop
 i=0
-path = utils.get_datafile()
+#path = utils.get_datafile()
 #data = test_load_udacity_dataset(path)
 
-for img, steering, speed in load_rosbag_data(path, frame_size):
+print "Preparing image data for viewer..."
+train_paths = u.get_data_paths(train_data_path)
+#print train_paths
+images_df = u.get_image_list(train_paths)
+num_images = images_df.shape[0]
+print "Found {} images.".format(num_images)
+
+#for img, steering, speed in u.udacity_data_generator(1, images_df, range(len(images_df))):   # (128, images_df, train_image_idx, 't')
+for img, steering, speed in u.udacity_data_generator(1, images_df, range(len(images_df)), get_speed = True, img_transpose=False,
+                                                     min_speed = 0, min_angle = 0):   # (128, images_df, train_image_idx, 't')
+
+    print img[0].shape
 
     predicted_steering = predict_steering_angle(i, img, speed)
-    draw_path_on(img, speed, steering)
-    draw_path_on(img, speed, predicted_steering, (0, 255, 0))
+    draw_path_on(img[0], speed, steering)
+    draw_path_on(img[0], speed, predicted_steering, (0, 255, 0))
 
     # Display image
-    cv2.imshow('Udacity challenge 2 - viewer', img)
-    key = cv2.waitKey(30)
+    cv2.imshow('Udacity challenge 2 - viewer', img[0])
+    key = cv2.waitKey(10)
 
     if key == ord('q'):
         break

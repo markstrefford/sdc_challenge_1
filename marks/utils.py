@@ -9,8 +9,11 @@ import scipy
 from skimage import transform as tf
 import pandas as pd
 
+# Set default values, etc.
 ch, width, height = 3, 200, 66
 
+train_data_path = '../data/Challenge 2/train'
+test_data_path = '../data/Challenge 2/test'
 
 ################################################################################
 # Get a list of directories for training or testing purposes
@@ -53,10 +56,14 @@ def split_train_and_validate(image_list, split = 1.0):
 ################################################################################
 # Generator for Keras over jpeg dataset (@ai-tor/@marks)
 ################################################################################
-def udacity_data_generator(batchsize, image_list, image_idx, flag, min_speed = 4, min_angle = 0.1, straight_road_prob = 0.2):
+def udacity_data_generator(batchsize, image_list, image_idx, get_speed = True, img_transpose = True, min_speed = 4, min_angle = 0.1, straight_road_prob = 0.2):
     # while 1:
-    x = np.zeros((batchsize, ch, width, height))  # Aligns with the way OpenCV works (height, width, ch)
+    if img_transpose == True:
+        x = np.zeros((batchsize, ch, width, height))
+    else:
+        x = np.zeros((batchsize, height, width, ch))
     y = np.zeros(batchsize)
+    z = np.zeros(batchsize)
     # iterators = []
 
     # for path in paths:
@@ -78,13 +85,20 @@ def udacity_data_generator(batchsize, image_list, image_idx, flag, min_speed = 4
             speed = image_list.at[idx, 'speed']
             imagepath = os.path.join(image_list.at[idx, 'imagepath'], image_list.at[idx, 'filename'])
             image = cv2.imread(imagepath)
+            cv2.imshow("Viewer", image)
             #try:
             img = cv2.resize(image, (200, 66))
             # print "Processing image {} at index {}... {}, {}".format(i, idx, img.shape, steering)
             r = np.random.uniform(0, 1)
             if ((abs(steering) > min_angle) and speed >= min_speed) or (r < straight_road_prob):
-                x[i, :, :, :] = img.transpose(2,1,0)   # Transpose the image to fit into the CNN later...
+                if img_transpose == True:
+                    x[i, :, :, :] = img.transpose(2,1,0)   # Transpose the image to fit into the CNN later...
+                else:
+                    x[i, :, :, :] = img
+
+                #x[i, :, :, :] = img.transpose(2,1,0)   # Transpose the image to fit into the CNN later...
                 y[i] = float(steering)
+                z[i] = float(speed)
                 i = i + 1
 
             #except:
@@ -95,7 +109,10 @@ def udacity_data_generator(batchsize, image_list, image_idx, flag, min_speed = 4
             if (i == batchsize):
                 i = 0
                 # print "x: {} / y: {}".format(x, y)
-                yield (x, y)
+                if get_speed == True:
+                    yield (x, y, z)
+                else:
+                    yield (x, y)
 
                 # except StopIteration:
                 #    it.close()

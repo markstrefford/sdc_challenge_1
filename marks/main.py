@@ -21,8 +21,8 @@ model.compile(optimizer, loss="mse")
 plot(model, to_file='model.png')
 stopping_callback = EarlyStopping(patience=5)
 
-train_data_path = '../data/Challenge 2/train'
-test_data_path = '../data/Challenge 2/test'
+train_data_path = utils.train_data_path  #'../data/Challenge 2/train'
+test_data_path = utils.'../data/Challenge 2/test'
 
 # TODO:
 # Find subdirectories
@@ -46,8 +46,8 @@ num_valid_samples = len(valid_image_idx)
 #train_paths = ["../data/center_camera/shuffled_list.txt", "../data/lft_camera/shuffled_list.txt", "../data/right_camera/shuffled_list.txt"]
 #val_paths = ["/home/aitor/udacity/center_camera/list_shuffled_val.txt", "/home/aitor/udacity/left_camera/list_shuffled_val.txt", "/home/aitor/udacity/right_camera/list_shuffled_val.txt"]
 
-train_generator = utils.udacity_data_generator(128, images_df, train_image_idx, 't')
-val_data = utils.udacity_data_generator(128, images_df, valid_image_idx, 'v')
+train_generator = utils.udacity_data_generator(128, images_df, train_image_idx, get_speed=False)
+val_data = utils.udacity_data_generator(128, images_df, valid_image_idx, get_speed=False)
 
 history = model.fit_generator(
     train_generator,
