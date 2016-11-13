@@ -9,7 +9,7 @@ Created on Thu Oct  6 19:01:55 2016
 from keras.models import Sequential, load_model
 from keras.layers import Flatten, Dense, Dropout, Lambda, ELU
 from keras.layers.convolutional import Convolution2D
-
+from keras.layers.pooling import MaxPooling2D
 
 # Based on:
 #   75% NVIDIA's end-to-end paper: https://arxiv.org/pdf/1604.07316v1.pdf
@@ -26,26 +26,26 @@ def getNNModel(model_path=None, reg_lambda=0.0):
 
         model.add(Convolution2D(24, 5, 5, subsample=(2, 2), border_mode='same', init='he_normal', name='conv1'))
         model.add(ELU())
-        # model.add(MaxPooling2D((2,2)))
+        #model.add(MaxPooling2D((5,5)))
 
         model.add(Convolution2D(36, 5, 5, subsample=(2, 2), border_mode='same', init='he_normal', name='conv2'))
         model.add(ELU())
         # model.add(MaxPooling2D((2,2), strides=(2,2)))
-        # model.add(MaxPooling2D((2,2)))
+        #model.add(MaxPooling2D((5,5)))
 
         model.add(Convolution2D(48, 5, 5, subsample=(2, 2), border_mode='same', init='he_normal', name='conv3'))
         model.add(ELU())
         # model.add(MaxPooling2D((2,2), strides=(2,2)))
-        # model.add(MaxPooling2D((2,2)))
+        #model.add(MaxPooling2D((5,5)))
 
         model.add(Convolution2D(64, 3, 3, border_mode='same', init='he_normal', name='conv4'))
         model.add(ELU())
         # model.add(MaxPooling2D((2,2), strides=(2,2)))
-        # model.add(MaxPooling2D((2,2)))
+        #model.add(MaxPooling2D((3,3)))
 
         model.add(Convolution2D(64, 3, 3, border_mode='same', init='he_normal', name='conv5'))
         # model.add(MaxPooling2D((2,2), strides=(2,2)))
-        # model.add(MaxPooling2D((2,2)))
+        #model.add(MaxPooling2D((2,2)))
 
         model.add(Flatten())
         model.add(ELU())

@@ -22,7 +22,8 @@ plot(model, to_file='model.png')
 stopping_callback = EarlyStopping(patience=5)
 
 train_data_path = utils.train_data_path  #'../data/Challenge 2/train'
-test_data_path = utils.'../data/Challenge 2/test'
+test_data_path = utils.test_data_path   #'../data/Challenge 2/test'
+ch, width, height = utils.ch, utils.width, utils.height
 
 # TODO:
 # Find subdirectories
@@ -33,7 +34,8 @@ test_data_path = utils.'../data/Challenge 2/test'
 print "Preparing training and validation data..."
 train_paths = utils.get_data_paths(train_data_path)
 #print train_paths
-images_df = utils.get_image_list(train_paths)
+img_df = utils.get_image_list(train_paths)
+images_df = images_df = img_df.loc[img_df['frame_id']=='center_camera'].reset_index(drop=True) #utils.get_image_list(train_paths)
 num_images = images_df.shape[0]
 print "Found {} training images.".format(num_images)
 
@@ -52,7 +54,7 @@ val_data = utils.data_generator(128, images_df, valid_image_idx, get_speed=False
 history = model.fit_generator(
     train_generator,
     samples_per_epoch=num_training_samples,
-    nb_epoch=25,
+    nb_epoch=5,
     validation_data=val_data,
     nb_val_samples=num_valid_samples
     #callbacks=[stopping_callback]
@@ -64,7 +66,7 @@ history = model.fit_generator(
 #Save it if it is ok-----------
 #response = utils.query_yes_no("Training session has finished. Do you want to save the model?")
 #if response:
-model.save("/data/models/model.h5")
+model.save("../model/trained_model_pooling.h5")
 #-----------------------------
 
 #Show results-----------------
