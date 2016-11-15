@@ -35,8 +35,6 @@ ch, width, height = utils.ch, utils.width, utils.height
 
 print "Preparing training and validation data..."
 train_paths = utils.get_data_paths(train_data_path)
-
-
 train_path_list, valid_path_list = utils.split_train_and_validate(train_paths, 0.8)    # Use 80% for training, 20% for validation
 
 # Get list of training images

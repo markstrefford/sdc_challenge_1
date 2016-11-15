@@ -53,9 +53,9 @@ def get_image_list(data_paths):
 ################################################################################
 # Get a list of testing images
 ################################################################################
-def get_test_image_list(data_path):
-    image_list = os.listdir(data_path)
-    return image_list
+# def get_test_image_list(data_path):
+#     image_list = os.listdir(data_path)
+#     return image_list
 
 ################################################################################
 # Create an index of training and validation images  (@marks)
