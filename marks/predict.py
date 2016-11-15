@@ -60,17 +60,19 @@ print "Found {} test images.".format(num_images)
 
 # Step through images and display with steering path
 x = np.zeros((1, 3, 200, 66), dtype=np.uint8)
+actual_angle = 0
 
 for idx, test_row in test_df.iterrows():
-    img_path=test_row['filename']
-    print "Image {}".format(img_path)
-    image = cv2.imread(os.path.join(test_data_path,img_path))
+    img_path=os.path.join(test_row['imagepath'],test_row['filename'])
+    #print "Image {}".format(img_path)
+    image = cv2.imread(img_path)
     x[0, :, :, :] = cv2.resize(image, (width, height)).transpose(2,1,0)
     y = model.predict(x, batch_size=1)[0][0]
 
     angle = test_row['angle']
     if angle != False:
-        utils.draw_path_on(image, test_row['speed'], test_row['angle']) # Actual (if it exists)
+        actual_angle = test_row['angle']
+        utils.draw_path_on(image, test_row['speed'],actual_angle ) # Actual (if it exists)
     speed = 10                                          # Assumption for now, we don't have the value in the test data!!
     utils.draw_path_on(image, speed, y, (0, 255, 0))    # Predicted
 
@@ -80,8 +82,7 @@ for idx, test_row in test_df.iterrows():
     if key == ord('q'):
         break
 
-    print "Steering angle: {} / Speed: {}".format(y, speed)  #, speed)
-    #i += 1
+    print "Index {}: Predicted steering angle: {} / actual angle: {} ".format(idx, actual_angle, y)  #, speed)
 
 cv2.destroyAllWindows()
 
