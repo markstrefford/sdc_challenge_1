@@ -35,6 +35,8 @@ ch, width, height = utils.ch, utils.width, utils.height
 
 print "Preparing training and validation data..."
 train_paths = utils.get_data_paths(train_data_path)
+
+
 train_path_list, valid_path_list = utils.split_train_and_validate(train_paths, 0.8)    # Use 80% for training, 20% for validation
 
 # Get list of training images
@@ -44,13 +46,15 @@ train_images_df = utils.get_image_df(train_path_list)
 num_train_images = train_images_df.shape[0]
 print "Found {} training images.".format(num_train_images)
 
-# Get list of validation images (TODO: Be DRY here!!)
+# Get list of validation images
 #valid_img_df = utils.get_image_list(valid_path_list)
 #valid_images_df = valid_img_df.loc[valid_img_df['frame_id']=='center_camera'].reset_index(drop=True) #utils.get_image_list(train_paths)
 valid_images_df = utils.get_image_df(valid_path_list)
 num_valid_images = valid_images_df.shape[0]
 print "Found {} validation images.".format(num_valid_images)
-valid_images_df.to_csv('../data/Challenge 2/validate_list.csv')     # TODO: Move this to somewhere else and parameterise
+
+# Save validation images for use by the viewer later
+valid_images_df.to_csv('../data/Challenge 2/validate_list.csv')     # TODO: Move filename to somewhere else and parameterise
 
 # Now set up generators for training
 train_generator = utils.data_generator(128, train_images_df, get_speed=False)

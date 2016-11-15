@@ -63,9 +63,9 @@ def get_test_image_list(data_path):
 def split_train_and_validate(image_list, split = 1.0):
     main_index = range(len(image_list))
     # Take a random sample of drivers into the training list
-    image_train_list = np.random.choice(int(len(main_index)), int(len(main_index)*split), replace = False)
+    image_train_list = np.random.choice(image_list, int(len(main_index)*split), replace = False)
     # Take the remaining drivers into the validation list
-    image_valid_list = [image for image in main_index if image not in image_train_list]
+    image_valid_list = [image for image in image_list if image not in image_train_list]
     return image_train_list, image_valid_list
 
 ################################################################################
