@@ -73,7 +73,7 @@ for img_path in test_paths:
     image = cv2.imread(os.path.join(test_data_path,img_path))
     x[0, :, :, :] = cv2.resize(image, (width, height)).transpose(2,1,0)
     y = model.predict(x, batch_size=1)[0][0]
-    
+
     speed = 10  # Assumption for now, we don't have the value in the test data!!
     utils.draw_path_on(image, speed, y, (0, 255, 0))
 

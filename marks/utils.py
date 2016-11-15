@@ -31,6 +31,14 @@ def get_data_paths(data_path):
 ################################################################################
 # Get a list of images from the provided csv file(s)    (@marks)
 ################################################################################
+def get_image_df(image_path_list):
+    img_df = get_image_list(image_path_list)
+    images_df = img_df.loc[img_df['frame_id']=='center_camera'].reset_index(drop=True)
+    return images_df
+
+################################################################################
+# Get a list of images from the provided csv file(s)    (@marks)
+################################################################################
 def get_image_list(data_paths):
     images_df = pd.DataFrame()
     csv_filename = 'interpolated.csv'
@@ -63,7 +71,7 @@ def split_train_and_validate(image_list, split = 1.0):
 ################################################################################
 # Generator for Keras over jpeg dataset (@ai-tor/@marks)
 ################################################################################
-def data_generator(batchsize, image_list, image_idx, get_speed = True, img_transpose = True, resize = True,
+def data_generator(batchsize, image_list, get_speed = True, img_transpose = True, resize = True,
                    min_speed = 4, min_angle = 0.1, straight_road_prob = 0.2):
 
 
@@ -89,7 +97,7 @@ def data_generator(batchsize, image_list, image_idx, get_speed = True, img_trans
     # files = map(iter, iterators)
     # while files:
     while True:
-        for idx in image_idx:
+        for idx in range(len(image_list)):
             # try:
             # line = it.next()
             # imagepath = os.path.dirname(it.name) + "/" + line.split()[0] + ".jpg"

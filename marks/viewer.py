@@ -148,7 +148,7 @@ num_images = images_df.shape[0]
 print "Found {} images.".format(num_images)
 
 #for img, steering, speed in u.udacity_data_generator(1, images_df, range(len(images_df))):   # (128, images_df, train_image_idx, 't')
-for img, steering, speed in u.data_generator(1, images_df, range(len(images_df)), get_speed = True, img_transpose=False,
+for img, steering, speed in u.data_generator(1, images_df, get_speed = True, img_transpose=False,
                                                      resize = False, min_speed = 0, min_angle = 0):   # (128, images_df, train_image_idx, 't')
 
     predicted_steering = predict_steering_angle(i, img, speed)
